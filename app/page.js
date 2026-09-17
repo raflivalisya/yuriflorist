@@ -6,7 +6,7 @@ import { supabase, formatDriveUrl } from '@/lib/supabase';
 export default function Home() {
   const [catalogData, setCatalogData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const phoneNumber = "6281234567890"; // Ganti dengan nomor WhatsApp Yuri Florist
+  const phoneNumber = "6281234567890"; // Ganti dengan nomor WA Toko
 
   useEffect(() => {
     async function getProducts() {
@@ -32,22 +32,22 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-rose-500 selection:text-white">
+    <div className="min-h-screen bg-pink-50/40 text-pink-950 font-sans selection:bg-pink-200 selection:text-pink-900">
       
       {/* NAVBAR */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-rose-100 shadow-sm px-6 py-4 flex justify-between items-center">
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-pink-100 shadow-sm px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <span className="text-2xl">🌸</span>
-          <h1 className="text-2xl font-extrabold tracking-tight text-rose-600">
-            Yuri <span className="text-slate-800">Florist</span>
+          <h1 className="text-2xl font-extrabold tracking-tight text-pink-400">
+            Yuri <span className="text-pink-900">Florist</span>
           </h1>
         </div>
         <nav className="flex items-center gap-6 font-medium text-sm">
-          <a href="#home" className="text-slate-600 hover:text-rose-600 transition-colors">Beranda</a>
-          <a href="#katalog" className="text-slate-600 hover:text-rose-600 transition-colors">Katalog</a>
+          <a href="#home" className="text-pink-800 hover:text-pink-500 transition-colors">Beranda</a>
+          <a href="#katalog" className="text-pink-800 hover:text-pink-500 transition-colors">Katalog</a>
           <a 
             href="/admin" 
-            className="text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white px-4 py-2 rounded-full transition-all duration-200 shadow-sm"
+            className="text-xs font-semibold bg-pink-100/70 border border-pink-200 text-pink-600 hover:bg-pink-300 hover:text-pink-950 px-4 py-2 rounded-full transition-all duration-200 shadow-sm"
           >
             Panel Admin
           </a>
@@ -55,21 +55,21 @@ export default function Home() {
       </header>
 
       {/* HERO SECTION */}
-      <section id="home" className="relative py-20 px-4 text-center bg-gradient-to-b from-rose-100/60 via-rose-50/30 to-slate-50 overflow-hidden">
+      <section id="home" className="relative py-20 px-4 text-center bg-gradient-to-b from-pink-100/80 via-pink-50/50 to-pink-50/10 overflow-hidden">
         <div className="max-w-3xl mx-auto relative z-10">
-          <span className="inline-block bg-rose-100 text-rose-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">
+          <span className="inline-block bg-pink-100 text-pink-600 text-xs font-semibold px-3.5 py-1.5 rounded-full mb-4 border border-pink-200/60 shadow-sm">
             ✨ Hand Bouquet & Premium Flower Arrangement
           </span>
-          <h2 className="text-4xl sm:text-5xl font-black text-slate-900 leading-tight mb-4 tracking-tight">
+          <h2 className="text-4xl sm:text-5xl font-black text-pink-950 leading-tight mb-4 tracking-tight">
             Bunga Indah untuk <br className="hidden sm:inline" />
-            <span className="text-rose-600">Momen Spesial</span> Anda
+            <span className="text-pink-400">Momen Spesial</span> Anda
           </h2>
-          <p className="text-slate-600 max-w-xl mx-auto text-base sm:text-lg mb-8 leading-relaxed">
+          <p className="text-pink-800/80 max-w-xl mx-auto text-base sm:text-lg mb-8 leading-relaxed">
             Temukan berbagai pilihan buket bunga segar dengan desain estetik dan kualitas terbaik untuk orang tersayang.
           </p>
           <a 
             href="#katalog"
-            className="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold px-6 py-3 rounded-full shadow-lg shadow-rose-500/20 hover:shadow-rose-500/30 hover:-translate-y-0.5 transition-all"
+            className="inline-flex items-center gap-2 bg-pink-300 hover:bg-pink-400 text-pink-950 font-bold px-6 py-3 rounded-full shadow-md shadow-pink-200 hover:-translate-y-0.5 transition-all"
           >
             Lihat Katalog Bunga ↓
           </a>
@@ -79,29 +79,29 @@ export default function Home() {
       {/* KATALOG SECTION */}
       <main id="katalog" className="max-w-7xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
-          <h3 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+          <h3 className="text-3xl font-extrabold text-pink-950 tracking-tight mb-2">
             Katalog Bunga
           </h3>
-          <div className="w-16 h-1 bg-rose-500 mx-auto rounded-full"></div>
+          <div className="w-16 h-1 bg-pink-300 mx-auto rounded-full"></div>
         </div>
 
         {loading ? (
           <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-rose-600"></div>
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-pink-400"></div>
           </div>
         ) : catalogData.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-200">
-            <p className="text-slate-500 text-sm">Belum ada produk bunga yang ditambahkan.</p>
+          <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-pink-200">
+            <p className="text-pink-400 text-sm">Belum ada produk bunga yang ditambahkan.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {catalogData.map((item) => (
               <div 
                 key={item.id} 
-                className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group"
+                className="bg-white rounded-3xl overflow-hidden border border-pink-100 shadow-sm hover:shadow-xl hover:shadow-pink-100 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group"
               >
                 {/* Foto Produk */}
-                <div className="relative w-full h-64 bg-slate-100 overflow-hidden">
+                <div className="relative w-full h-64 bg-pink-50 overflow-hidden">
                   <img 
                     src={formatDriveUrl(item.image)} 
                     alt={item.name} 
@@ -113,23 +113,25 @@ export default function Home() {
                 {/* Detail Produk */}
                 <div className="p-6 flex flex-col flex-grow justify-between text-left">
                   <div className="mb-4">
-                    <h4 className="font-bold text-slate-900 text-lg mb-1 group-hover:text-rose-600 transition-colors line-clamp-1">
+                    <h4 className="font-bold text-pink-950 text-lg mb-1 group-hover:text-pink-400 transition-colors line-clamp-1">
                       {item.name}
                     </h4>
-                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-pink-700/70 line-clamp-2 leading-relaxed">
                       {item.description}
                     </p>
                   </div>
 
                   <div>
-                    <div className="text-xl font-black text-rose-600 mb-4">
+                    {/* Harga Pink Pastel */}
+                    <div className="text-xl font-black text-pink-400 mb-4">
                       {formatRupiah(item.price)}
                     </div>
+                    {/* Tombol Pesan WA Pink Pastel */}
                     <a
                       href={`https://wa.me/${phoneNumber}?text=Halo%20Yuri%20Florist,%20saya%20mau%20pesan%20${encodeURIComponent(item.name)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold py-2.5 px-4 rounded-xl shadow-md shadow-emerald-500/10 transition-all duration-200"
+                      className="flex items-center justify-center gap-2 w-full bg-pink-200 hover:bg-pink-300 text-pink-900 text-sm font-bold py-2.5 px-4 rounded-2xl shadow-sm transition-all duration-200"
                     >
                       💬 Pesan via WA
                     </a>
@@ -142,9 +144,9 @@ export default function Home() {
       </main>
 
       {/* FOOTER */}
-      <footer id="kontak" className="bg-white border-t border-slate-100 text-center py-8 px-4 text-sm text-slate-500">
-        <p className="font-medium text-slate-700">Yuri Florist &copy; {new Date().getFullYear()}</p>
-        <p className="text-xs text-slate-400 mt-1">Rangkaian Bunga Segar & Buket Cantik</p>
+      <footer id="kontak" className="bg-white border-t border-pink-100 text-center py-8 px-4 text-sm text-pink-800/70">
+        <p className="font-semibold text-pink-950">Yuri Florist &copy; {new Date().getFullYear()}</p>
+        <p className="text-xs text-pink-400 mt-1">Rangkaian Bunga Segar & Buket Cantik</p>
       </footer>
 
     </div>
