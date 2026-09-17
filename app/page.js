@@ -25,6 +25,9 @@ export default function Home() {
   const admin1Number = "6282183486092";
   const admin2Number = "6282178889350";
 
+  // Pesan Otomatis WhatsApp
+  const waMessage = encodeURIComponent("haloo kak, bagaimana cara ordernya ya? apakah bisa same day/ dadakan?");
+
   // URL Google Maps Yuri Florist
   const googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=yuri+florist";
 
@@ -129,7 +132,7 @@ export default function Home() {
               Lihat Folder Katalog ↓
             </a>
             <a 
-              href={`https://wa.me/${admin1Number}?text=Halo%20Admin%201%20Yuri%20Florist,%20saya%20ingin%20bertanya`}
+              href={`https://wa.me/${admin1Number}?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#F8DCE8] hover:bg-[#F2CCD2] text-[#4A3E3D] font-bold px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm flex items-center gap-1"
@@ -137,7 +140,7 @@ export default function Home() {
               💬 Admin 1
             </a>
             <a 
-              href={`https://wa.me/${admin2Number}?text=Halo%20Admin%202%20Yuri%20Florist,%20saya%20ingin%20bertanya`}
+              href={`https://wa.me/${admin2Number}?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#F8DCE8] hover:bg-[#F2CCD2] text-[#4A3E3D] font-bold px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm flex items-center gap-1"
