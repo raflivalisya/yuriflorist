@@ -78,13 +78,14 @@ export default function AdminPage() {
   };
 
   // --- HANDLER RESET PASSWORD SAYA ---
+// --- HANDLER RESET PASSWORD ---
   const handleResetPassword = () => {
-    if (confirm('Yakin ingin mereset password kembali default?')) {
+    if (confirm('Yakin ingin mereset password kembali ke admin123?')) {
       localStorage.removeItem('admin_password');
       setCurrentPassword('admin123');
       setInputPassword('');
       setLoginError('');
-      alert('Password berhasil direset ke password default);
+      alert('Password berhasil direset ke password default: admin123');
     }
   };
 
