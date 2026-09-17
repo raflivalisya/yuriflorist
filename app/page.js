@@ -21,8 +21,12 @@ export default function Home() {
   const [subcategories, setSubcategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Nomor WhatsApp Admin Yuri Florist
   const admin1Number = "6282183486092";
   const admin2Number = "6282178889350";
+
+  // URL Google Maps Yuri Florist
+  const googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=yuri+florist";
 
   useEffect(() => {
     async function getProducts() {
@@ -45,7 +49,6 @@ export default function Home() {
       )
     );
     setSubcategories(availableSubs);
-    // Atur default jenis bunga pertama jika ada
     setActiveSubcategory(availableSubs.length > 0 ? availableSubs[0] : null);
   }, [activeCategory, catalogData]);
 
@@ -97,10 +100,27 @@ export default function Home() {
             Bunga Indah untuk <br className="hidden sm:inline" />
             <span className="text-[#E8A5C2]">Momen Spesial</span> Anda
           </h2>
-          <p className="text-[#6E5B58] max-w-xl mx-auto text-xs sm:text-lg mb-6 sm:mb-8 leading-relaxed">
+          <p className="text-[#6E5B58] max-w-xl mx-auto text-xs sm:text-lg mb-4 leading-relaxed">
             Pilih folder kategori dan jenis bunga favorit Anda di bawah ini.
           </p>
 
+          {/* BADGE LOKASI */}
+          <div className="inline-flex items-center gap-1.5 bg-white/80 border border-[#EFE8DE] px-3 sm:px-4 py-1.5 rounded-full shadow-sm mb-6 max-w-md mx-auto">
+            <span className="text-xs sm:text-sm">📍</span>
+            <span className="text-[10px] sm:text-xs text-[#6E5B58] font-medium truncate">
+              Jl Cirebon No 64, Sukarame II, Teluk Betung Barat
+            </span>
+            <a 
+              href={googleMapsUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[10px] sm:text-xs text-[#B85B84] font-bold underline hover:text-[#E8A5C2] ml-1 shrink-0"
+            >
+              Maps ↗
+            </a>
+          </div>
+
+          {/* TOMBOL KATALOG & CHAT ADMIN */}
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
             <a 
               href="#katalog"
@@ -231,10 +251,27 @@ export default function Home() {
         )}
       </main>
 
-      {/* FOOTER */}
-      <footer id="kontak" className="bg-white border-t border-[#EFE8DE] text-center py-6 sm:py-8 px-4 text-xs sm:text-sm text-[#6E5B58]">
-        <p className="font-semibold text-[#4A3E3D]">Yuri Florist &copy; {new Date().getFullYear()}</p>
-        <p className="text-[10px] sm:text-xs text-[#B85B84] mt-1">Rangkaian Bunga Segar & Buket Cantik</p>
+      {/* FOOTER & INFORMASI LOKASI */}
+      <footer id="kontak" className="bg-white border-t border-[#EFE8DE] text-center py-6 sm:py-10 px-4 text-xs sm:text-sm text-[#6E5B58]">
+        <div className="max-w-md mx-auto mb-4">
+          <p className="font-bold text-[#4A3E3D] text-sm sm:text-base">📍 Alamat Outlet / Store:</p>
+          <p className="text-xs text-[#6E5B58] mt-1 leading-relaxed">
+            Jl Cirebon No 64, Sukarame II, Teluk Betung Barat
+          </p>
+          <a 
+            href={googleMapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 mt-2 bg-[#F8E3EC] text-[#B85B84] hover:bg-[#E8A5C2] hover:text-white text-xs font-bold px-4 py-1.5 rounded-full transition-all shadow-sm"
+          >
+            🗺️ Buka di Google Maps (yuri florist)
+          </a>
+        </div>
+        
+        <div className="border-t border-[#EFE8DE] pt-4 max-w-xs mx-auto">
+          <p className="font-semibold text-[#4A3E3D]">Yuri Florist &copy; {new Date().getFullYear()}</p>
+          <p className="text-[10px] sm:text-xs text-[#B85B84] mt-0.5">Rangkaian Bunga Segar & Buket Cantik</p>
+        </div>
       </footer>
 
     </div>
