@@ -77,6 +77,17 @@ export default function AdminPage() {
     }
   };
 
+  // --- HANDLER RESET PASSWORD SAYA ---
+  const handleResetPassword = () => {
+    if (confirm('Yakin ingin mereset password kembali ke "admin123"?')) {
+      localStorage.removeItem('admin_password');
+      setCurrentPassword('admin123');
+      setInputPassword('');
+      setLoginError('');
+      alert('Password berhasil direset ke password bawaan: admin123');
+    }
+  };
+
   // --- HANDLER GANTI PASSWORD ---
   const handleChangePassword = (e) => {
     e.preventDefault();
@@ -97,7 +108,7 @@ export default function AdminPage() {
       return;
     }
 
-    // Simpan password baru
+    // Simpan password baru ke localStorage
     localStorage.setItem('admin_password', newPassword);
     setCurrentPassword(newPassword);
     setPasswordMsg({ text: 'Password berhasil diperbarui!', type: 'success' });
@@ -190,7 +201,7 @@ export default function AdminPage() {
                 placeholder="Masukkan Password Admin"
                 value={inputPassword}
                 onChange={(e) => setInputPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-[#E8DDD1] focus:outline-none focus:border-[#E8A5C2] text-sm"
+                className="w-full px-4 py-3 rounded-xl border border-[#E8DDD1] focus:outline-none focus:border-[#E8A5C2] text-sm text-center"
                 required
               />
             </div>
@@ -206,6 +217,18 @@ export default function AdminPage() {
               Masuk Dashboard
             </button>
           </form>
+
+          {/* TOMBOL BANTUAN RESET LUPA PASSWORD */}
+          <div className="mt-6 pt-4 border-t border-[#EFE8DE]">
+            <button
+              type="button"
+              onClick={handleResetPassword}
+              className="text-[11px] text-[#B85B84] hover:underline font-semibold"
+            >
+              ❓ Lupa Password? Reset ke Default (admin123)
+            </button>
+          </div>
+
         </div>
       </div>
     );
