@@ -206,10 +206,6 @@ export default function AdminPage() {
               Masuk Dashboard
             </button>
           </form>
-
-          <p className="text-[10px] text-[#A09391] mt-6">
-            Password bawaan awal: <code className="bg-[#FAF7F2] px-1.5 py-0.5 rounded text-[#B85B84] font-bold">admin123</code>
-          </p>
         </div>
       </div>
     );
