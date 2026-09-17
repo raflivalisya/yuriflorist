@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { supabase, formatDriveUrl } from '@/lib/supabase';
 
 const CATEGORIES = [
-  'Semua',
   'Artificial Flowers',
   'Fresh Flowers',
   'Snack & Chocolate',
@@ -17,11 +16,11 @@ const CATEGORIES = [
 
 export default function Home() {
   const [catalogData, setCatalogData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [activeCategory, setActiveCategory] = useState('Semua');
+  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]);
+  const [activeSubcategory, setActiveSubcategory] = useState(null);
+  const [subcategories, setSubcategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Ganti nomor WhatsApp kedua Admin
   const admin1Number = "6281234567890";
   const admin2Number = "6289876543210";
 
@@ -30,22 +29,29 @@ export default function Home() {
       const { data, error } = await supabase.from('products').select('*').order('id', { ascending: true });
       if (!error && data) {
         setCatalogData(data);
-        setFilteredData(data);
       }
       setLoading(false);
     }
     getProducts();
   }, []);
 
-  // Filter Produk berdasarkan Kategori
-  const handleCategoryChange = (cat) => {
-    setActiveCategory(cat);
-    if (cat === 'Semua') {
-      setFilteredData(catalogData);
-    } else {
-      setFilteredData(catalogData.filter((item) => item.category === cat));
-    }
-  };
+  // Filter jenis bunga (Sub-Folder) setiap kali Folder Utama berganti
+  useEffect(() => {
+    const availableSubs = Array.from(
+      new Set(
+        catalogData
+          .filter((item) => item.category === activeCategory && item.subcategory)
+          .map((item) => item.subcategory)
+      )
+    );
+    setSubcategories(availableSubs);
+    // Atur default jenis bunga pertama jika ada
+    setActiveSubcategory(availableSubs.length > 0 ? availableSubs[0] : null);
+  }, [activeCategory, catalogData]);
+
+  const displayedProducts = catalogData.filter(
+    (item) => item.category === activeCategory && item.subcategory === activeSubcategory
+  );
 
   const formatRupiah = (price) => {
     if (!price) return 'Rp 0';
@@ -74,7 +80,7 @@ export default function Home() {
           <a href="#katalog" className="text-[#6E5B58] hover:text-[#E8A5C2] transition-colors">Katalog</a>
           <a 
             href="/admin" 
-            className="text-[10px] sm:text-xs font-semibold bg-[#F5ECE3] border border-[#E8DDD1] text-[#6E5B58] hover:bg-[#E8A5C2] hover:text-white px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all duration-200 shadow-sm"
+            className="text-[10px] sm:text-xs font-semibold bg-[#F5ECE3] border border-[#E8DDD1] text-[#6E5B58] hover:bg-[#E8A5C2] hover:text-white px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all shadow-sm"
           >
             Admin
           </a>
@@ -92,30 +98,29 @@ export default function Home() {
             <span className="text-[#E8A5C2]">Momen Spesial</span> Anda
           </h2>
           <p className="text-[#6E5B58] max-w-xl mx-auto text-xs sm:text-lg mb-6 sm:mb-8 leading-relaxed">
-            Temukan berbagai pilihan buket bunga segar, snack, hingga kado unik dengan kualitas terbaik.
+            Pilih folder kategori dan jenis bunga favorit Anda di bawah ini.
           </p>
 
-          {/* TOMBOL KATALOG & CHAT ADMIN 1 & 2 */}
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
             <a 
               href="#katalog"
-              className="bg-[#E8A5C2] hover:bg-[#D893B0] text-white font-bold px-4 sm:px-6 py-2.5 sm:py-3 rounded-full shadow-md shadow-[#E8A5C2]/30 hover:-translate-y-0.5 transition-all text-xs sm:text-sm"
+              className="bg-[#E8A5C2] hover:bg-[#D893B0] text-white font-bold px-4 sm:px-6 py-2.5 sm:py-3 rounded-full shadow-md shadow-[#E8A5C2]/30 transition-all text-xs sm:text-sm"
             >
-              Lihat Katalog Bunga ↓
+              Lihat Folder Katalog ↓
             </a>
             <a 
-              href={`https://wa.me/${admin1Number}?text=Halo%20Admin%201%20Yuri%20Florist,%20saya%20ingin%20bertanya%20mengenai%20katalog%20bunga`}
+              href={`https://wa.me/${admin1Number}?text=Halo%20Admin%201%20Yuri%20Florist,%20saya%20ingin%20bertanya`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#F8DCE8] hover:bg-[#F2CCD2] text-[#4A3E3D] font-bold px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-full shadow-sm hover:-translate-y-0.5 transition-all text-xs sm:text-sm flex items-center gap-1"
+              className="bg-[#F8DCE8] hover:bg-[#F2CCD2] text-[#4A3E3D] font-bold px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm flex items-center gap-1"
             >
               💬 Admin 1
             </a>
             <a 
-              href={`https://wa.me/${admin2Number}?text=Halo%20Admin%202%20Yuri%20Florist,%20saya%20ingin%20bertanya%20mengenai%20katalog%20bunga`}
+              href={`https://wa.me/${admin2Number}?text=Halo%20Admin%202%20Yuri%20Florist,%20saya%20ingin%20bertanya`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#F8DCE8] hover:bg-[#F2CCD2] text-[#4A3E3D] font-bold px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-full shadow-sm hover:-translate-y-0.5 transition-all text-xs sm:text-sm flex items-center gap-1"
+              className="bg-[#F8DCE8] hover:bg-[#F2CCD2] text-[#4A3E3D] font-bold px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm flex items-center gap-1"
             >
               💬 Admin 2
             </a>
@@ -125,41 +130,68 @@ export default function Home() {
 
       {/* KATALOG SECTION */}
       <main id="katalog" className="max-w-7xl mx-auto px-3 sm:px-6 py-8 sm:py-16">
-        <div className="text-center mb-6 sm:mb-8">
-          <h3 className="text-xl sm:text-3xl font-extrabold text-[#4A3E3D] tracking-tight mb-1.5 sm:mb-2">
+        <div className="text-center mb-8">
+          <h3 className="text-xl sm:text-3xl font-extrabold text-[#4A3E3D] tracking-tight mb-2">
             Katalog Bunga
           </h3>
           <div className="w-12 sm:w-16 h-1 bg-[#E8A5C2] mx-auto rounded-full mb-6"></div>
 
-          {/* TAB FOLDER / KATEGORI */}
-          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2.5 max-w-4xl mx-auto">
+          {/* LEVEL 1: FOLDER UTAMA */}
+          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2.5 max-w-4xl mx-auto mb-6">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
-                onClick={() => handleCategoryChange(cat)}
-                className={`text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all duration-200 border ${
+                onClick={() => setActiveCategory(cat)}
+                className={`text-[11px] sm:text-xs font-bold px-3.5 sm:px-4 py-2 rounded-2xl transition-all border flex items-center gap-1.5 ${
                   activeCategory === cat
-                    ? 'bg-[#E8A5C2] text-white border-[#E8A5C2] shadow-sm'
-                    : 'bg-white text-[#6E5B58] border-[#EFE8DE] hover:bg-[#F8E3EC] hover:text-[#B85B84]'
+                    ? 'bg-[#E8A5C2] text-white border-[#E8A5C2] shadow-md'
+                    : 'bg-white text-[#6E5B58] border-[#EFE8DE] hover:bg-[#F8E3EC]'
                 }`}
               >
-                {cat}
+                📁 {cat}
               </button>
             ))}
           </div>
+
+          {/* LEVEL 2: SUB-FOLDER (FILE JENIS BUNGA) */}
+          {subcategories.length > 0 && (
+            <div className="bg-white/80 backdrop-blur-md p-3 sm:p-4 rounded-2xl border border-[#EFE8DE] max-w-3xl mx-auto shadow-sm">
+              <span className="block text-[10px] sm:text-xs font-bold text-[#B85B84] mb-2 uppercase tracking-wider">
+                📄 Pilih Jenis Bunga di Folder "{activeCategory}":
+              </span>
+              <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
+                {subcategories.map((sub) => (
+                  <button
+                    key={sub}
+                    onClick={() => setActiveSubcategory(sub)}
+                    className={`text-[11px] sm:text-xs font-medium px-3 py-1.5 rounded-xl transition-all border ${
+                      activeSubcategory === sub
+                        ? 'bg-[#F8E3EC] text-[#B85B84] border-[#F0D0E0] font-bold shadow-sm'
+                        : 'bg-[#FAF7F2] text-[#6E5B58] border-[#E8DDD1] hover:bg-white'
+                    }`}
+                  >
+                    📄 {sub}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
+        {/* LEVEL 3: KATALOG FOTO */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-[#E8A5C2]"></div>
           </div>
-        ) : filteredData.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl sm:rounded-3xl border border-dashed border-[#EFE8DE]">
-            <p className="text-[#B85B84] text-xs sm:text-sm">Belum ada produk di kategori {activeCategory}.</p>
+        ) : !activeSubcategory || displayedProducts.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-2xl sm:rounded-3xl border border-dashed border-[#EFE8DE] max-w-2xl mx-auto">
+            <p className="text-[#B85B84] text-xs sm:text-sm">
+              Belum ada foto produk untuk jenis bunga ini di folder <strong>{activeCategory}</strong>.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-8">
-            {filteredData.map((item) => (
+            {displayedProducts.map((item) => (
               <div 
                 key={item.id} 
                 className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-[#EFE8DE] shadow-sm hover:shadow-lg hover:shadow-[#F8E3EC] transition-all duration-300 flex flex-col justify-between group"
@@ -172,11 +204,9 @@ export default function Home() {
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  {item.category && (
-                    <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-md text-[#B85B84] text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#F0D0E0]">
-                      {item.category}
-                    </span>
-                  )}
+                  <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-md text-[#B85B84] text-[9px] font-bold px-2 py-0.5 rounded-full border border-[#F0D0E0]">
+                    {item.subcategory}
+                  </span>
                 </div>
                 
                 {/* Detail Produk */}
