@@ -225,7 +225,7 @@ export default function AdminPage() {
               onClick={handleResetPassword}
               className="text-[11px] text-[#B85B84] hover:underline font-semibold"
             >
-              ❓ Lupa Password? Reset ke Default
+              ❓ Lupa Password? Reset ke Default ()
             </button>
           </div>
 
