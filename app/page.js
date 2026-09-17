@@ -21,8 +21,8 @@ export default function Home() {
   const [subcategories, setSubcategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const admin1Number = "6281234567890";
-  const admin2Number = "6289876543210";
+  const admin1Number = "6282183486092";
+  const admin2Number = "6282178889350";
 
   useEffect(() => {
     async function getProducts() {
