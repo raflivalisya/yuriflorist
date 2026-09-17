@@ -3,16 +3,19 @@
 import { useState, useEffect } from 'react';
 import { supabase, formatDriveUrl } from '@/lib/supabase';
 
-const CATEGORIES = [
-  'Artificial Flowers',
-  'Fresh Flowers',
-  'Snack & Chocolate',
-  'Money Bouquet',
-  'Doll Series',
-  'Custom Bouquet',
-  'Bloom Box & Vas',
-  'Wedding Bouquet',
-];
+// Pemetaan Ikon Emoji Sesuai Kategori
+const CATEGORY_ICONS = {
+  'Artificial Flowers': '🌺',
+  'Fresh Flowers': '🌹',
+  'Snack & Chocolate': '🍫',
+  'Money Bouquet': '💵',
+  'Doll Series': '🧸',
+  'Custom Bouquet': '✨',
+  'Bloom Box & Vas': '🪴',
+  'Wedding Bouquet': '💍',
+};
+
+const CATEGORIES = Object.keys(CATEGORY_ICONS);
 
 export default function Home() {
   const [catalogData, setCatalogData] = useState([]);
@@ -159,7 +162,7 @@ export default function Home() {
           </h3>
           <div className="w-12 sm:w-16 h-1 bg-[#E8A5C2] mx-auto rounded-full mb-6"></div>
 
-          {/* LEVEL 1: FOLDER UTAMA */}
+          {/* LEVEL 1: FOLDER UTAMA DENGAN IKON SESUAI KATEGORI */}
           <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2.5 max-w-4xl mx-auto mb-6">
             {CATEGORIES.map((cat) => (
               <button
@@ -171,7 +174,8 @@ export default function Home() {
                     : 'bg-white text-[#6E5B58] border-[#EFE8DE] hover:bg-[#F8E3EC]'
                 }`}
               >
-                📁 {cat}
+                <span>{CATEGORY_ICONS[cat] || '📁'}</span>
+                <span>{cat}</span>
               </button>
             ))}
           </div>
