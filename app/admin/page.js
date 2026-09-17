@@ -79,12 +79,12 @@ export default function AdminPage() {
 
   // --- HANDLER RESET PASSWORD SAYA ---
   const handleResetPassword = () => {
-    if (confirm('Yakin ingin mereset password kembali ke "admin123"?')) {
+    if (confirm('Yakin ingin mereset password kembali default?')) {
       localStorage.removeItem('admin_password');
       setCurrentPassword('admin123');
       setInputPassword('');
       setLoginError('');
-      alert('Password berhasil direset ke password bawaan: admin123');
+      alert('Password berhasil direset ke password default);
     }
   };
 
@@ -225,7 +225,7 @@ export default function AdminPage() {
               onClick={handleResetPassword}
               className="text-[11px] text-[#B85B84] hover:underline font-semibold"
             >
-              ❓ Lupa Password? Reset ke Default (admin123)
+              ❓ Lupa Password? Reset ke Default
             </button>
           </div>
 
