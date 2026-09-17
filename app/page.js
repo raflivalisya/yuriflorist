@@ -6,7 +6,10 @@ import { supabase, formatDriveUrl } from '@/lib/supabase';
 export default function Home() {
   const [catalogData, setCatalogData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const phoneNumber = "6281234567890"; // Ganti dengan nomor WA Toko
+
+  // Ganti nomor WhatsApp kedua Admin (gunakan format 62...)
+  const admin1Number = "6281234567890";
+  const admin2Number = "6289876543210";
 
   useEffect(() => {
     async function getProducts() {
@@ -67,12 +70,32 @@ export default function Home() {
           <p className="text-pink-800/80 max-w-xl mx-auto text-base sm:text-lg mb-8 leading-relaxed">
             Temukan berbagai pilihan buket bunga segar dengan desain estetik dan kualitas terbaik untuk orang tersayang.
           </p>
-          <a 
-            href="#katalog"
-            className="inline-flex items-center gap-2 bg-pink-300 hover:bg-pink-400 text-pink-950 font-bold px-6 py-3 rounded-full shadow-md shadow-pink-200 hover:-translate-y-0.5 transition-all"
-          >
-            Lihat Katalog Bunga ↓
-          </a>
+
+          {/* TOMBOL KATALOG & CHAT ADMIN 1 & 2 */}
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <a 
+              href="#katalog"
+              className="bg-pink-400 hover:bg-pink-500 text-white font-bold px-6 py-3 rounded-full shadow-md shadow-pink-200 hover:-translate-y-0.5 transition-all text-sm"
+            >
+              Lihat Katalog Bunga ↓
+            </a>
+            <a 
+              href={`https://wa.me/${admin1Number}?text=Halo%20Admin%201%20Yuri%20Florist,%20saya%20ingin%20bertanya%20mengenai%20katalog%20bunga`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-pink-200 hover:bg-pink-300 text-pink-950 font-bold px-5 py-3 rounded-full shadow-sm hover:-translate-y-0.5 transition-all text-sm flex items-center gap-1.5"
+            >
+              💬 Admin 1
+            </a>
+            <a 
+              href={`https://wa.me/${admin2Number}?text=Halo%20Admin%202%20Yuri%20Florist,%20saya%20ingin%20bertanya%20mengenai%20katalog%20bunga`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-pink-200 hover:bg-pink-300 text-pink-950 font-bold px-5 py-3 rounded-full shadow-sm hover:-translate-y-0.5 transition-all text-sm flex items-center gap-1.5"
+            >
+              💬 Admin 2
+            </a>
+          </div>
         </div>
       </section>
 
@@ -110,31 +133,20 @@ export default function Home() {
                   />
                 </div>
                 
-                {/* Detail Produk */}
+                {/* Detail Produk (Tampilan Murni Katalog) */}
                 <div className="p-6 flex flex-col flex-grow justify-between text-left">
-                  <div className="mb-4">
+                  <div>
                     <h4 className="font-bold text-pink-950 text-lg mb-1 group-hover:text-pink-400 transition-colors line-clamp-1">
                       {item.name}
                     </h4>
-                    <p className="text-xs text-pink-700/70 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-pink-700/70 line-clamp-2 leading-relaxed mb-4">
                       {item.description}
                     </p>
                   </div>
 
-                  <div>
-                    {/* Harga Pink Pastel */}
-                    <div className="text-xl font-black text-pink-400 mb-4">
-                      {formatRupiah(item.price)}
-                    </div>
-                    {/* Tombol Pesan WA Pink Pastel */}
-                    <a
-                      href={`https://wa.me/${phoneNumber}?text=Halo%20Yuri%20Florist,%20saya%20mau%20pesan%20${encodeURIComponent(item.name)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full bg-pink-200 hover:bg-pink-300 text-pink-900 text-sm font-bold py-2.5 px-4 rounded-2xl shadow-sm transition-all duration-200"
-                    >
-                      💬 Pesan via WA
-                    </a>
+                  {/* Harga */}
+                  <div className="text-xl font-black text-pink-400">
+                    {formatRupiah(item.price)}
                   </div>
                 </div>
               </div>
