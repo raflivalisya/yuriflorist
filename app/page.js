@@ -3,11 +3,25 @@
 import { useState, useEffect } from 'react';
 import { supabase, formatDriveUrl } from '@/lib/supabase';
 
+const CATEGORIES = [
+  'Semua',
+  'Artificial Flowers',
+  'Fresh Flowers',
+  'Snack & Chocolate',
+  'Money Bouquet',
+  'Doll Series',
+  'Custom Bouquet',
+  'Bloom Box & Vas',
+  'Wedding Bouquet',
+];
+
 export default function Home() {
   const [catalogData, setCatalogData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [activeCategory, setActiveCategory] = useState('Semua');
   const [loading, setLoading] = useState(true);
 
-  // Ganti nomor WhatsApp kedua Admin (gunakan format 62...)
+  // Ganti nomor WhatsApp kedua Admin
   const admin1Number = "6281234567890";
   const admin2Number = "6289876543210";
 
@@ -16,13 +30,23 @@ export default function Home() {
       const { data, error } = await supabase.from('products').select('*').order('id', { ascending: true });
       if (!error && data) {
         setCatalogData(data);
+        setFilteredData(data);
       }
       setLoading(false);
     }
     getProducts();
   }, []);
 
-  // Helper merapikan format harga ke Rupiah
+  // Filter Produk berdasarkan Kategori
+  const handleCategoryChange = (cat) => {
+    setActiveCategory(cat);
+    if (cat === 'Semua') {
+      setFilteredData(catalogData);
+    } else {
+      setFilteredData(catalogData.filter((item) => item.category === cat));
+    }
+  };
+
   const formatRupiah = (price) => {
     if (!price) return 'Rp 0';
     const numberOnly = price.toString().replace(/[^0-9]/g, '');
@@ -35,7 +59,6 @@ export default function Home() {
   };
 
   return (
-    /* Background Khaki/Cream Lembut */
     <div className="min-h-screen bg-[#FAF7F2] text-[#4A3E3D] font-sans selection:bg-[#F3C5D8] selection:text-[#4A3E3D]">
       
       {/* NAVBAR */}
@@ -69,7 +92,7 @@ export default function Home() {
             <span className="text-[#E8A5C2]">Momen Spesial</span> Anda
           </h2>
           <p className="text-[#6E5B58] max-w-xl mx-auto text-xs sm:text-lg mb-6 sm:mb-8 leading-relaxed">
-            Temukan berbagai pilihan buket bunga segar dengan desain estetik dan kualitas terbaik untuk orang tersayang.
+            Temukan berbagai pilihan buket bunga segar, snack, hingga kado unik dengan kualitas terbaik.
           </p>
 
           {/* TOMBOL KATALOG & CHAT ADMIN 1 & 2 */}
@@ -102,24 +125,41 @@ export default function Home() {
 
       {/* KATALOG SECTION */}
       <main id="katalog" className="max-w-7xl mx-auto px-3 sm:px-6 py-8 sm:py-16">
-        <div className="text-center mb-6 sm:mb-12">
+        <div className="text-center mb-6 sm:mb-8">
           <h3 className="text-xl sm:text-3xl font-extrabold text-[#4A3E3D] tracking-tight mb-1.5 sm:mb-2">
             Katalog Bunga
           </h3>
-          <div className="w-12 sm:w-16 h-1 bg-[#E8A5C2] mx-auto rounded-full"></div>
+          <div className="w-12 sm:w-16 h-1 bg-[#E8A5C2] mx-auto rounded-full mb-6"></div>
+
+          {/* TAB FOLDER / KATEGORI */}
+          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2.5 max-w-4xl mx-auto">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => handleCategoryChange(cat)}
+                className={`text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all duration-200 border ${
+                  activeCategory === cat
+                    ? 'bg-[#E8A5C2] text-white border-[#E8A5C2] shadow-sm'
+                    : 'bg-white text-[#6E5B58] border-[#EFE8DE] hover:bg-[#F8E3EC] hover:text-[#B85B84]'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
 
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-[#E8A5C2]"></div>
           </div>
-        ) : catalogData.length === 0 ? (
+        ) : filteredData.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-2xl sm:rounded-3xl border border-dashed border-[#EFE8DE]">
-            <p className="text-[#B85B84] text-xs sm:text-sm">Belum ada produk bunga yang ditambahkan.</p>
+            <p className="text-[#B85B84] text-xs sm:text-sm">Belum ada produk di kategori {activeCategory}.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-8">
-            {catalogData.map((item) => (
+            {filteredData.map((item) => (
               <div 
                 key={item.id} 
                 className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-[#EFE8DE] shadow-sm hover:shadow-lg hover:shadow-[#F8E3EC] transition-all duration-300 flex flex-col justify-between group"
@@ -132,6 +172,11 @@ export default function Home() {
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
+                  {item.category && (
+                    <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-md text-[#B85B84] text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#F0D0E0]">
+                      {item.category}
+                    </span>
+                  )}
                 </div>
                 
                 {/* Detail Produk */}
@@ -145,7 +190,7 @@ export default function Home() {
                     </p>
                   </div>
 
-                  {/* Harga Pink Pastel Manis */}
+                  {/* Harga */}
                   <div className="text-sm sm:text-xl font-black text-[#D878A0]">
                     {formatRupiah(item.price)}
                   </div>
