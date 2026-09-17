@@ -96,41 +96,47 @@ export default function Home() {
         </nav>
       </header>
 
-      {/* HERO SECTION */}
-      <section id="home" className="relative py-12 sm:py-20 px-4 text-center bg-gradient-to-b from-[#F7EBE8]/70 via-[#FAF7F2]/50 to-[#FAF7F2] overflow-hidden">
+      {/* HERO SECTION PERCANTIK */}
+      <section id="home" className="relative py-12 sm:py-20 px-4 text-center bg-gradient-to-b from-[#F7EBE8] via-[#FAF7F2]/60 to-[#FAF7F2] overflow-hidden">
         <div className="max-w-3xl mx-auto relative z-10">
-          <span className="inline-block bg-[#F8E3EC] text-[#B85B84] text-[10px] sm:text-xs font-semibold px-3 py-1 rounded-full mb-3 sm:mb-4 border border-[#F0D0E0] shadow-sm">
-            ✨ Hand Bouquet & Premium Flower Arrangement
+          
+          {/* BADGE TOP */}
+          <span className="inline-flex items-center gap-1.5 bg-white/90 text-[#B85B84] text-xs sm:text-sm font-bold px-4 py-1.5 rounded-full mb-4 border border-[#F0D0E0] shadow-sm">
+            Premium Flowers 🌷
           </span>
-          <h2 className="text-2xl sm:text-5xl font-black text-[#4A3E3D] leading-tight mb-3 sm:mb-4 tracking-tight">
-            Bunga Indah untuk <br className="hidden sm:inline" />
-            <span className="text-[#E8A5C2]">Momen Spesial</span> Anda
+
+          {/* JUDUL UTAMA */}
+          <h2 className="text-3xl sm:text-5xl font-black text-[#4A3E3D] leading-tight mb-3 tracking-tight">
+            Special Gift For <br />
+            <span className="text-[#E8A5C2] drop-shadow-sm">Special People</span>
           </h2>
-          <p className="text-[#6E5B58] max-w-xl mx-auto text-xs sm:text-lg mb-4 leading-relaxed">
-            Pilih folder kategori dan jenis bunga favorit Anda di bawah ini.
+
+          {/* DESKRIPSI & INSTRUKSI ORDER */}
+          <p className="text-[#6E5B58] max-w-xl mx-auto text-xs sm:text-base mb-6 leading-relaxed bg-white/60 backdrop-blur-sm p-4 rounded-2xl border border-[#EFE8DE] shadow-xs">
+            Silakan cek dan pilih referensi di katalog yang tersedia di bawah ini, lalu <strong>screenshoot</strong> dan tanyakan stock pada admin 🥰
           </p>
 
-          {/* BADGE LOKASI */}
-          <div className="inline-flex items-center gap-1.5 bg-white/80 border border-[#EFE8DE] px-3 sm:px-4 py-1.5 rounded-full shadow-sm mb-6 max-w-md mx-auto">
-            <span className="text-xs sm:text-sm">📍</span>
-            <span className="text-[10px] sm:text-xs text-[#6E5B58] font-medium truncate">
+          {/* BADGE LOKASI ALAMAT */}
+          <div className="inline-flex items-center gap-2 bg-white border border-[#EFE8DE] px-4 py-2 rounded-full shadow-sm mb-8 max-w-md mx-auto hover:border-[#E8A5C2] transition-colors">
+            <span className="text-sm">📍</span>
+            <span className="text-xs text-[#6E5B58] font-medium truncate">
               Jl Cirebon No 64, Sukarame II, Teluk Betung Barat
             </span>
             <a 
               href={googleMapsUrl} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-[10px] sm:text-xs text-[#B85B84] font-bold underline hover:text-[#E8A5C2] ml-1 shrink-0"
+              className="text-xs text-[#B85B84] font-bold underline hover:text-[#E8A5C2] shrink-0"
             >
               Maps ↗
             </a>
           </div>
 
           {/* TOMBOL KATALOG & CHAT ADMIN */}
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
             <a 
               href="#katalog"
-              className="bg-[#E8A5C2] hover:bg-[#D893B0] text-white font-bold px-4 sm:px-6 py-2.5 sm:py-3 rounded-full shadow-md shadow-[#E8A5C2]/30 transition-all text-xs sm:text-sm"
+              className="bg-[#E8A5C2] hover:bg-[#D893B0] text-white font-bold px-5 sm:px-7 py-3 rounded-full shadow-md shadow-[#E8A5C2]/30 transition-all text-xs sm:text-sm flex items-center gap-1.5"
             >
               Lihat Folder Katalog ↓
             </a>
@@ -138,7 +144,7 @@ export default function Home() {
               href={`https://wa.me/${admin1Number}?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#F8DCE8] hover:bg-[#F2CCD2] text-[#4A3E3D] font-bold px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm flex items-center gap-1"
+              className="bg-white hover:bg-[#F8E3EC] text-[#4A3E3D] font-bold px-4 sm:px-5 py-3 rounded-full text-xs sm:text-sm flex items-center gap-1.5 border border-[#EFE8DE] shadow-xs transition-all"
             >
               💬 Admin 1
             </a>
@@ -146,11 +152,12 @@ export default function Home() {
               href={`https://wa.me/${admin2Number}?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#F8DCE8] hover:bg-[#F2CCD2] text-[#4A3E3D] font-bold px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm flex items-center gap-1"
+              className="bg-white hover:bg-[#F8E3EC] text-[#4A3E3D] font-bold px-4 sm:px-5 py-3 rounded-full text-xs sm:text-sm flex items-center gap-1.5 border border-[#EFE8DE] shadow-xs transition-all"
             >
               💬 Admin 2
             </a>
           </div>
+
         </div>
       </section>
 
