@@ -208,17 +208,6 @@ export default function AdminPage() {
             </button>
           </form>
 
-          {/* TOMBOL BANTUAN RESET LUPA PASSWORD */}
-          <div className="mt-6 pt-4 border-t border-[#EFE8DE]">
-            <button
-              type="button"
-              onClick={handleResetPassword}
-              className="text-[11px] text-[#B85B84] hover:underline font-semibold"
-            >
-              ❓ Lupa Password? Reset ke Default ()
-            </button>
-          </div>
-
         </div>
       </div>
     );
