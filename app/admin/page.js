@@ -33,13 +33,16 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
 
+  // STATE FILTER KATEGORI DAFTAR PRODUK
+  const [selectedFilterCategory, setSelectedFilterCategory] = useState('ALL');
+
   // Form disederhanakan: hanya Kategori, Sub-Folder, dan URL Foto
   const [formData, setFormData] = useState({
     category: CATEGORIES[0],
     subcategory: '',
     image: '',
-    name: 'Katalog', // Default nilai di database
-    price: '0',     // Default nilai di database
+    name: 'Katalog',
+    price: '0',
     description: '',
   });
 
@@ -184,6 +187,16 @@ export default function AdminPage() {
       description: '',
     });
   };
+
+  // Kategori yang difilter untuk ditampilkan
+  const categoriesToDisplay = selectedFilterCategory === 'ALL'
+    ? CATEGORIES
+    : [selectedFilterCategory];
+
+  // Hitung produk yang sesuai dengan filter saat ini
+  const filteredProductsCount = products.filter(p => 
+    selectedFilterCategory === 'ALL' ? true : p.category === selectedFilterCategory
+  ).length;
 
   // ==========================================
   // TAMPILAN 1: HALAMAN LOGIN
@@ -333,30 +346,57 @@ export default function AdminPage() {
           </form>
         </div>
 
-        {/* DAFTAR PRODUK DIKELOMPOKKAN PER KATEGORI */}
-        <div className="lg:col-span-2 space-y-6">
-          <h2 className="text-lg font-bold text-[#4A3E3D] bg-white p-4 rounded-2xl border border-[#EFE8DE] shadow-sm flex items-center justify-between">
-            <span>📦 Daftar Foto Terpasang</span>
-            <span className="text-xs font-normal text-[#B85B84] bg-[#F8E3EC] px-3 py-1 rounded-full">
-              Total: {products.length} Foto
-            </span>
-          </h2>
+        {/* DAFTAR PRODUK DENGAN FILTER KATEGORI */}
+        <div className="lg:col-span-2 space-y-4">
+          
+          {/* HEADER DAFTAR + DROPDOWN FILTER */}
+          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#EFE8DE] shadow-sm flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-bold text-[#4A3E3D] flex items-center gap-2">
+                📦 Daftar Foto Terpasang
+              </h2>
+              <p className="text-[11px] text-[#6E5B58] mt-0.5">
+                Menampilkan: <strong className="text-[#B85B84]">{filteredProductsCount} foto</strong>
+              </p>
+            </div>
 
+            {/* DROPDOWN FILTER KATEGORI */}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <span className="text-xs font-bold text-[#6E5B58] shrink-0">🔍 Filter:</span>
+              <select
+                value={selectedFilterCategory}
+                onChange={(e) => setSelectedFilterCategory(e.target.value)}
+                className="w-full sm:w-auto px-3 py-2 text-xs font-semibold bg-[#FAF7F2] border border-[#E8DDD1] rounded-xl focus:outline-none focus:border-[#E8A5C2] text-[#4A3E3D]"
+              >
+                <option value="ALL">🌟 Semua Kategori ({products.length})</option>
+                {CATEGORIES.map((cat) => {
+                  const count = products.filter(p => p.category === cat).length;
+                  return (
+                    <option key={cat} value={cat}>
+                      📁 {cat} ({count})
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          </div>
+
+          {/* TABEL LISTING */}
           {loading ? (
             <div className="text-center py-12 text-xs text-[#B85B84] bg-white rounded-2xl border border-[#EFE8DE]">
               Memuat data katalog...
             </div>
-          ) : products.length === 0 ? (
+          ) : filteredProductsCount === 0 ? (
             <div className="text-center py-12 text-xs text-gray-400 bg-white rounded-2xl border border-[#EFE8DE]">
-              Belum ada foto katalog yang diupload.
+              Belum ada foto katalog untuk kategori yang dipilih.
             </div>
           ) : (
-            CATEGORIES.map((cat) => {
+            categoriesToDisplay.map((cat) => {
               const catProducts = products.filter((p) => p.category === cat);
               if (catProducts.length === 0) return null;
 
               return (
-                <div key={cat} className="bg-white rounded-2xl border border-[#EFE8DE] shadow-sm overflow-hidden">
+                <div key={cat} className="bg-white rounded-2xl border border-[#EFE8DE] shadow-sm overflow-hidden mb-4">
                   {/* HEADER KATEGORI */}
                   <div className="bg-[#FAF7F2] px-4 py-3 border-b border-[#EFE8DE] flex justify-between items-center">
                     <h3 className="font-extrabold text-xs sm:text-sm text-[#B85B84] flex items-center gap-2">
