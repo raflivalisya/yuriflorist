@@ -33,8 +33,9 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
 
-  // STATE FILTER KATEGORI DAFTAR PRODUK
+  // STATE FILTER KATEGORI & SUB-FOLDER DAFTAR PRODUK
   const [selectedFilterCategory, setSelectedFilterCategory] = useState('ALL');
+  const [selectedFilterSubcategory, setSelectedFilterSubcategory] = useState('ALL');
 
   // Form disederhanakan: hanya Kategori, Sub-Folder, dan URL Foto
   const [formData, setFormData] = useState({
@@ -188,15 +189,33 @@ export default function AdminPage() {
     });
   };
 
-  // Kategori yang difilter untuk ditampilkan
+  // 1. Dapatkan daftar opsi Sub-Folder unik berdasarkan Kategori Filter yang dipilih
+  const availableSubcategoriesForFilter = Array.from(
+    new Set(
+      products
+        .filter((p) => (selectedFilterCategory === 'ALL' ? true : p.category === selectedFilterCategory))
+        .map((p) => p.subcategory)
+        .filter(Boolean)
+    )
+  );
+
+  // 2. Kategori yang akan ditampilkan
   const categoriesToDisplay = selectedFilterCategory === 'ALL'
     ? CATEGORIES
     : [selectedFilterCategory];
 
-  // Hitung produk yang sesuai dengan filter saat ini
-  const filteredProductsCount = products.filter(p => 
-    selectedFilterCategory === 'ALL' ? true : p.category === selectedFilterCategory
-  ).length;
+  // 3. Filter akhir untuk mendapatkan daftar produk yang tampil
+  const filteredProducts = products.filter((p) => {
+    const matchCategory = selectedFilterCategory === 'ALL' || p.category === selectedFilterCategory;
+    const matchSubcategory = selectedFilterSubcategory === 'ALL' || p.subcategory === selectedFilterSubcategory;
+    return matchCategory && matchSubcategory;
+  });
+
+  // Reset filter subkategori jika kategori berubah
+  const handleCategoryFilterChange = (cat) => {
+    setSelectedFilterCategory(cat);
+    setSelectedFilterSubcategory('ALL');
+  };
 
   // ==========================================
   // TAMPILAN 1: HALAMAN LOGIN
@@ -346,27 +365,27 @@ export default function AdminPage() {
           </form>
         </div>
 
-        {/* DAFTAR PRODUK DENGAN FILTER KATEGORI */}
+        {/* DAFTAR PRODUK DENGAN DUAL FILTER (KATEGORI & SUB-FOLDER) */}
         <div className="lg:col-span-2 space-y-4">
           
-          {/* HEADER DAFTAR + DROPDOWN FILTER */}
-          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#EFE8DE] shadow-sm flex flex-wrap items-center justify-between gap-3">
+          {/* HEADER DAFTAR + DOUBLE DROPDOWN FILTER */}
+          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#EFE8DE] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-bold text-[#4A3E3D] flex items-center gap-2">
                 📦 Daftar Foto Terpasang
               </h2>
               <p className="text-[11px] text-[#6E5B58] mt-0.5">
-                Menampilkan: <strong className="text-[#B85B84]">{filteredProductsCount} foto</strong>
+                Menampilkan: <strong className="text-[#B85B84]">{filteredProducts.length} foto</strong>
               </p>
             </div>
 
-            {/* DROPDOWN FILTER KATEGORI */}
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <span className="text-xs font-bold text-[#6E5B58] shrink-0">🔍 Filter:</span>
+            {/* BARIS DROPDOWN FILTER */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* FILTER KATEGORI */}
               <select
                 value={selectedFilterCategory}
-                onChange={(e) => setSelectedFilterCategory(e.target.value)}
-                className="w-full sm:w-auto px-3 py-2 text-xs font-semibold bg-[#FAF7F2] border border-[#E8DDD1] rounded-xl focus:outline-none focus:border-[#E8A5C2] text-[#4A3E3D]"
+                onChange={(e) => handleCategoryFilterChange(e.target.value)}
+                className="px-3 py-2 text-xs font-semibold bg-[#FAF7F2] border border-[#E8DDD1] rounded-xl focus:outline-none focus:border-[#E8A5C2] text-[#4A3E3D]"
               >
                 <option value="ALL">🌟 Semua Kategori ({products.length})</option>
                 {CATEGORIES.map((cat) => {
@@ -374,6 +393,27 @@ export default function AdminPage() {
                   return (
                     <option key={cat} value={cat}>
                       📁 {cat} ({count})
+                    </option>
+                  );
+                })}
+              </select>
+
+              {/* FILTER SUB-FOLDER / JENIS BUNGA */}
+              <select
+                value={selectedFilterSubcategory}
+                onChange={(e) => setSelectedFilterSubcategory(e.target.value)}
+                className="px-3 py-2 text-xs font-semibold bg-[#FAF7F2] border border-[#E8DDD1] rounded-xl focus:outline-none focus:border-[#E8A5C2] text-[#4A3E3D]"
+              >
+                <option value="ALL">📄 Semua Sub-Folder</option>
+                {availableSubcategoriesForFilter.map((sub) => {
+                  const count = products.filter(
+                    (p) =>
+                      p.subcategory === sub &&
+                      (selectedFilterCategory === 'ALL' || p.category === selectedFilterCategory)
+                  ).length;
+                  return (
+                    <option key={sub} value={sub}>
+                      📄 {sub} ({count})
                     </option>
                   );
                 })}
@@ -386,13 +426,14 @@ export default function AdminPage() {
             <div className="text-center py-12 text-xs text-[#B85B84] bg-white rounded-2xl border border-[#EFE8DE]">
               Memuat data katalog...
             </div>
-          ) : filteredProductsCount === 0 ? (
+          ) : filteredProducts.length === 0 ? (
             <div className="text-center py-12 text-xs text-gray-400 bg-white rounded-2xl border border-[#EFE8DE]">
-              Belum ada foto katalog untuk kategori yang dipilih.
+              Tidak ditemukan foto katalog yang sesuai dengan filter.
             </div>
           ) : (
             categoriesToDisplay.map((cat) => {
-              const catProducts = products.filter((p) => p.category === cat);
+              // Ambil foto dalam kategori ini yang lolos filter subkategori
+              const catProducts = filteredProducts.filter((p) => p.category === cat);
               if (catProducts.length === 0) return null;
 
               return (
