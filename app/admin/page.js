@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, formatDriveUrl } from '@/lib/supabase';
 
 const CATEGORIES = [
   'Artificial Flowers',
@@ -15,10 +15,10 @@ const CATEGORIES = [
 ];
 
 export default function AdminPage() {
-  // --- STATE AUTENTIKASI & PASSWORD ---
+  // --- STATE AUTENTIKASI ---
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [inputPassword, setInputPassword] = useState('');
-  const [currentPassword, setCurrentPassword] = useState('admin123'); // Password bawaan
+  const [currentPassword, setCurrentPassword] = useState('admin123');
   const [loginError, setLoginError] = useState('');
 
   // State Form Ganti Password
@@ -33,16 +33,17 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
 
+  // Form disederhanakan: hanya Kategori, Sub-Folder, dan URL Foto
   const [formData, setFormData] = useState({
-    name: '',
     category: CATEGORIES[0],
     subcategory: '',
-    price: '',
-    description: '',
     image: '',
+    name: 'Katalog', // Default nilai di database
+    price: '0',     // Default nilai di database
+    description: '',
   });
 
-  // Load password dari localStorage jika ada
+  // Load password dari localStorage
   useEffect(() => {
     const savedPassword = localStorage.getItem('admin_password');
     if (savedPassword) {
@@ -50,7 +51,7 @@ export default function AdminPage() {
     }
   }, []);
 
-  // Fetch Produk jika sudah login
+  // Fetch Produk
   useEffect(() => {
     if (isAuthenticated) {
       fetchProducts();
@@ -66,7 +67,7 @@ export default function AdminPage() {
     setLoading(false);
   }
 
-  // --- HANDLER LOGIN ---
+  // --- HANDLER LOGIN & RESET ---
   const handleLogin = (e) => {
     e.preventDefault();
     if (inputPassword === currentPassword) {
@@ -77,8 +78,16 @@ export default function AdminPage() {
     }
   };
 
+  const handleResetPassword = () => {
+    if (confirm('Yakin ingin mereset password kembali ke admin123?')) {
+      localStorage.removeItem('admin_password');
+      setCurrentPassword('admin123');
+      setInputPassword('');
+      setLoginError('');
+      alert('Password berhasil direset ke password default: admin123');
+    }
+  };
 
-  // --- HANDLER GANTI PASSWORD ---
   const handleChangePassword = (e) => {
     e.preventDefault();
     setPasswordMsg({ text: '', type: '' });
@@ -98,12 +107,10 @@ export default function AdminPage() {
       return;
     }
 
-    // Simpan password baru ke localStorage
     localStorage.setItem('admin_password', newPassword);
     setCurrentPassword(newPassword);
     setPasswordMsg({ text: 'Password berhasil diperbarui!', type: 'success' });
 
-    // Reset Form
     setOldPassword('');
     setNewPassword('');
     setConfirmPassword('');
@@ -113,7 +120,7 @@ export default function AdminPage() {
     }, 1500);
   };
 
-  // --- HANDLER PRODUK (TAMBAH / EDIT / HAPUS) ---
+  // --- HANDLER PRODUK ---
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -122,20 +129,25 @@ export default function AdminPage() {
     e.preventDefault();
     setLoading(true);
 
+    const payload = {
+      ...formData,
+      name: formData.subcategory || 'Katalog',
+    };
+
     if (editingId) {
-      await supabase.from('products').update(formData).eq('id', editingId);
+      await supabase.from('products').update(payload).eq('id', editingId);
       setEditingId(null);
     } else {
-      await supabase.from('products').insert([formData]);
+      await supabase.from('products').insert([payload]);
     }
 
     setFormData({
-      name: '',
       category: CATEGORIES[0],
       subcategory: '',
-      price: '',
-      description: '',
       image: '',
+      name: 'Katalog',
+      price: '0',
+      description: '',
     });
 
     fetchProducts();
@@ -144,17 +156,17 @@ export default function AdminPage() {
   const handleEdit = (item) => {
     setEditingId(item.id);
     setFormData({
-      name: item.name || '',
       category: item.category || CATEGORIES[0],
       subcategory: item.subcategory || '',
-      price: item.price || '',
-      description: item.description || '',
       image: item.image || '',
+      name: item.name || 'Katalog',
+      price: item.price || '0',
+      description: item.description || '',
     });
   };
 
   const handleDelete = async (id) => {
-    if (confirm('Yakin ingin menghapus produk ini?')) {
+    if (confirm('Yakin ingin menghapus foto katalog ini?')) {
       setLoading(true);
       await supabase.from('products').delete().eq('id', id);
       fetchProducts();
@@ -164,17 +176,17 @@ export default function AdminPage() {
   const handleCancelEdit = () => {
     setEditingId(null);
     setFormData({
-      name: '',
       category: CATEGORIES[0],
       subcategory: '',
-      price: '',
-      description: '',
       image: '',
+      name: 'Katalog',
+      price: '0',
+      description: '',
     });
   };
 
   // ==========================================
-  // TAMPILAN 1: HALAMAN LOGIN ADMIN
+  // TAMPILAN 1: HALAMAN LOGIN
   // ==========================================
   if (!isAuthenticated) {
     return (
@@ -208,6 +220,15 @@ export default function AdminPage() {
             </button>
           </form>
 
+          <div className="mt-6 pt-4 border-t border-[#EFE8DE]">
+            <button
+              type="button"
+              onClick={handleResetPassword}
+              className="text-[11px] text-[#B85B84] hover:underline font-semibold"
+            >
+              ❓ Lupa Password? Reset ke Default (admin123)
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -222,9 +243,9 @@ export default function AdminPage() {
       <div className="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-4 mb-8 bg-white p-4 sm:p-6 rounded-2xl border border-[#EFE8DE] shadow-sm">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-[#4A3E3D] flex items-center gap-2">
-            ⚙️ Panel Kelola Produk
+            ⚙️ Panel Kelola Foto Katalog
           </h1>
-          <p className="text-xs text-[#6E5B58]">Tambah, ubah, atau hapus produk di Yuri Florist</p>
+          <p className="text-xs text-[#6E5B58]">Upload dan atur katalog foto per kategori</p>
         </div>
         
         <div className="flex gap-2">
@@ -245,33 +266,20 @@ export default function AdminPage() {
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* FORM TAMBAH / EDIT PRODUK */}
+        {/* FORM UPLOAD SIMPEL */}
         <div className="bg-white p-6 rounded-2xl border border-[#EFE8DE] shadow-sm h-fit">
           <h2 className="text-lg font-bold text-[#4A3E3D] mb-4 flex items-center gap-2">
-            {editingId ? '✏️ Edit Produk' : '➕ Tambah Produk Baru'}
+            {editingId ? '✏️ Edit Foto Katalog' : '➕ Tambah Foto Katalog'}
           </h2>
 
           <form onSubmit={handleSubmitProduct} className="space-y-4 text-xs">
-            <div>
-              <label className="block font-bold mb-1">Nama Produk</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                placeholder="Contoh: Buket Mawar Merah"
-                className="w-full px-3 py-2 border border-[#E8DDD1] rounded-xl focus:outline-none focus:border-[#E8A5C2]"
-                required
-              />
-            </div>
-
             <div>
               <label className="block font-bold mb-1">Kategori (Folder Utama)</label>
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-[#E8DDD1] rounded-xl focus:outline-none focus:border-[#E8A5C2]"
+                className="w-full px-3 py-2 border border-[#E8DDD1] rounded-xl focus:outline-none focus:border-[#E8A5C2] font-semibold text-[#4A3E3D]"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>{cat}</option>
@@ -286,27 +294,14 @@ export default function AdminPage() {
                 name="subcategory"
                 value={formData.subcategory}
                 onChange={handleInputChange}
-                placeholder="Contoh: Mawar / Tulip / Snack"
+                placeholder="Contoh: Pink Series / Mawar / Tulips"
                 className="w-full px-3 py-2 border border-[#E8DDD1] rounded-xl focus:outline-none focus:border-[#E8A5C2]"
                 required
               />
             </div>
 
             <div>
-              <label className="block font-bold mb-1">Harga (Rp)</label>
-              <input
-                type="text"
-                name="price"
-                value={formData.price}
-                onChange={handleInputChange}
-                placeholder="Contoh: 150000"
-                className="w-full px-3 py-2 border border-[#E8DDD1] rounded-xl focus:outline-none focus:border-[#E8A5C2]"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block font-bold mb-1">URL Foto (Google Drive/Lainnya)</label>
+              <label className="block font-bold mb-1">URL Foto Katalog (Google Drive / Link)</label>
               <input
                 type="text"
                 name="image"
@@ -318,24 +313,12 @@ export default function AdminPage() {
               />
             </div>
 
-            <div>
-              <label className="block font-bold mb-1">Deskripsi Produk</label>
-              <textarea
-                name="description"
-                rows="3"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Penjelasan ringkas produk"
-                className="w-full px-3 py-2 border border-[#E8DDD1] rounded-xl focus:outline-none focus:border-[#E8A5C2]"
-              ></textarea>
-            </div>
-
             <div className="flex gap-2 pt-2">
               <button
                 type="submit"
                 className="flex-1 bg-[#E8A5C2] hover:bg-[#D893B0] text-white font-bold py-2.5 rounded-xl transition-all"
               >
-                {editingId ? 'Update Produk' : 'Simpan Produk'}
+                {editingId ? 'Update Foto' : 'Simpan Foto'}
               </button>
               {editingId && (
                 <button
@@ -350,67 +333,97 @@ export default function AdminPage() {
           </form>
         </div>
 
-        {/* TABEL DAFTAR PRODUK */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-[#EFE8DE] shadow-sm">
-          <h2 className="text-lg font-bold text-[#4A3E3D] mb-4">📦 Daftar Produk Terpasang</h2>
+        {/* DAFTAR PRODUK DIKELOMPOKKAN PER KATEGORI */}
+        <div className="lg:col-span-2 space-y-6">
+          <h2 className="text-lg font-bold text-[#4A3E3D] bg-white p-4 rounded-2xl border border-[#EFE8DE] shadow-sm flex items-center justify-between">
+            <span>📦 Daftar Foto Terpasang</span>
+            <span className="text-xs font-normal text-[#B85B84] bg-[#F8E3EC] px-3 py-1 rounded-full">
+              Total: {products.length} Foto
+            </span>
+          </h2>
 
           {loading ? (
-            <div className="text-center py-12 text-xs text-[#B85B84]">Memuat data produk...</div>
-          ) : products.length === 0 ? (
-            <div className="text-center py-12 text-xs text-gray-400">Belum ada produk yang ditambahkan.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-[#EFE8DE] text-[#B85B84] bg-[#FAF7F2]">
-                    <th className="p-2.5">Produk</th>
-                    <th className="p-2.5">Kategori</th>
-                    <th className="p-2.5">Harga</th>
-                    <th className="p-2.5 text-center">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#EFE8DE]">
-                  {products.map((item) => (
-                    <tr key={item.id} className="hover:bg-[#FAF7F2]/50">
-                      <td className="p-2.5 font-bold">{item.name}</td>
-                      <td className="p-2.5 text-[11px] text-[#6E5B58]">
-                        <span className="bg-[#F8E3EC] text-[#B85B84] px-2 py-0.5 rounded-full font-semibold">
-                          {item.category}
-                        </span>
-                        <div className="text-[10px] mt-0.5">{item.subcategory}</div>
-                      </td>
-                      <td className="p-2.5 font-semibold text-[#D878A0]">
-                        Rp {Number(item.price).toLocaleString('id-ID')}
-                      </td>
-                      <td className="p-2.5 text-center">
-                        <div className="flex justify-center gap-1.5">
-                          <button
-                            onClick={() => handleEdit(item)}
-                            className="bg-amber-100 text-amber-700 hover:bg-amber-200 px-2.5 py-1 rounded-lg text-[10px] font-bold"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item.id)}
-                            className="bg-red-100 text-red-600 hover:bg-red-200 px-2.5 py-1 rounded-lg text-[10px] font-bold"
-                          >
-                            Hapus
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="text-center py-12 text-xs text-[#B85B84] bg-white rounded-2xl border border-[#EFE8DE]">
+              Memuat data katalog...
             </div>
+          ) : products.length === 0 ? (
+            <div className="text-center py-12 text-xs text-gray-400 bg-white rounded-2xl border border-[#EFE8DE]">
+              Belum ada foto katalog yang diupload.
+            </div>
+          ) : (
+            CATEGORIES.map((cat) => {
+              const catProducts = products.filter((p) => p.category === cat);
+              if (catProducts.length === 0) return null;
+
+              return (
+                <div key={cat} className="bg-white rounded-2xl border border-[#EFE8DE] shadow-sm overflow-hidden">
+                  {/* HEADER KATEGORI */}
+                  <div className="bg-[#FAF7F2] px-4 py-3 border-b border-[#EFE8DE] flex justify-between items-center">
+                    <h3 className="font-extrabold text-xs sm:text-sm text-[#B85B84] flex items-center gap-2">
+                      📁 {cat}
+                    </h3>
+                    <span className="text-[10px] bg-white px-2.5 py-0.5 rounded-full border border-[#EFE8DE] text-[#6E5B58] font-bold">
+                      {catProducts.length} foto
+                    </span>
+                  </div>
+
+                  {/* TABEL PER KATEGORI */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="border-b border-[#EFE8DE] text-gray-400 text-[11px]">
+                          <th className="p-3 w-16 text-center">Preview</th>
+                          <th className="p-3">Jenis / Sub-Folder</th>
+                          <th className="p-3 text-center w-28">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#EFE8DE]">
+                        {catProducts.map((item) => (
+                          <tr key={item.id} className="hover:bg-[#FAF7F2]/50">
+                            {/* Preview Gambar */}
+                            <td className="p-2 text-center">
+                              <img
+                                src={formatDriveUrl(item.image)}
+                                alt={item.subcategory}
+                                referrerPolicy="no-referrer"
+                                className="w-10 h-10 object-cover rounded-lg border border-[#EFE8DE] mx-auto bg-[#FAF7F2]"
+                              />
+                            </td>
+                            {/* Nama Sub-Folder */}
+                            <td className="p-3 font-bold text-[#4A3E3D]">
+                              📄 {item.subcategory || '-'}
+                            </td>
+                            {/* Tombol Akses */}
+                            <td className="p-3 text-center">
+                              <div className="flex justify-center gap-1.5">
+                                <button
+                                  onClick={() => handleEdit(item)}
+                                  className="bg-amber-100 text-amber-700 hover:bg-amber-200 px-2.5 py-1 rounded-lg text-[10px] font-bold"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(item.id)}
+                                  className="bg-red-100 text-red-600 hover:bg-red-200 px-2.5 py-1 rounded-lg text-[10px] font-bold"
+                                >
+                                  Hapus
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })
           )}
         </div>
 
       </div>
 
-      {/* ========================================== */}
-      {/* MODAL / POPUP GANTI PASSWORD */}
-      {/* ========================================== */}
+      {/* MODAL GANTI PASSWORD */}
       {showChangePasswordModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-[#EFE8DE] shadow-xl">
