@@ -300,7 +300,7 @@ export default function Home() {
         </div>
         
         <div className="border-t border-[#EFE8DE] pt-4 max-w-xs mx-auto">
-          <p className="font-semibold text-[#4A3E3D]">Yuri Florist &copy; {new Date().getFullYear()}</p>
+          <p className="font-semibold text-[#4A3E3D]">Yuri Florist &copy; 2021</p>
           <p className="text-[10px] sm:text-xs text-[#B85B84] mt-0.5">Rangkaian Bunga Segar & Buket Cantik</p>
         </div>
       </footer>
