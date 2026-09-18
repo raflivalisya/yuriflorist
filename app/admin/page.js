@@ -41,7 +41,7 @@ export default function AdminPage() {
   const [formData, setFormData] = useState({
     category: CATEGORIES[0],
     subcategory: '',
-    image: '',
+    imageLinks: '', // Mengampung banyak link dipisah enter
     price: '0',
     description: '',
   });
@@ -132,22 +132,50 @@ export default function AdminPage() {
     e.preventDefault();
     setLoading(true);
 
-    const payload = {
-      ...formData,
-      name: formData.subcategory || 'Katalog',
-    };
-
     if (editingId) {
+      // MODE EDIT (Satu Item)
+      const payload = {
+        category: formData.category,
+        subcategory: formData.subcategory,
+        image: formData.imageLinks.trim(),
+        price: formData.price,
+        description: formData.description,
+        name: formData.subcategory || 'Katalog',
+      };
       await supabase.from('products').update(payload).eq('id', editingId);
       setEditingId(null);
     } else {
-      await supabase.from('products').insert([payload]);
+      // MODE TAMBAH BANYAK (Bulk Upload)
+      // Memisah tautan berdasarkan baris baru (enter)
+      const urls = formData.imageLinks
+        .split('\n')
+        .map((url) => url.trim())
+        .filter((url) => url.length > 0);
+
+      if (urls.length === 0) {
+        alert('Masukkan minimal satu link foto!');
+        setLoading(false);
+        return;
+      }
+
+      // Format data masal
+      const payloadArray = urls.map((url) => ({
+        category: formData.category,
+        subcategory: formData.subcategory,
+        image: url,
+        price: formData.price,
+        description: formData.description,
+        name: formData.subcategory || 'Katalog',
+      }));
+
+      await supabase.from('products').insert(payloadArray);
     }
 
+    // Reset Form
     setFormData({
-      category: CATEGORIES[0],
-      subcategory: '',
-      image: '',
+      category: formData.category, // Tetap simpan kategori terakhir biar cepat
+      subcategory: formData.subcategory, // Tetap simpan sub-folder terakhir
+      imageLinks: '',
       price: '0',
       description: '',
     });
@@ -160,7 +188,7 @@ export default function AdminPage() {
     setFormData({
       category: item.category || CATEGORIES[0],
       subcategory: item.subcategory || '',
-      image: item.image || '',
+      imageLinks: item.image || '',
       price: item.price || '0',
       description: item.description || '',
     });
@@ -179,7 +207,7 @@ export default function AdminPage() {
     setFormData({
       category: CATEGORIES[0],
       subcategory: '',
-      image: '',
+      imageLinks: '',
       price: '0',
       description: '',
     });
@@ -270,7 +298,7 @@ export default function AdminPage() {
           <h1 className="text-xl sm:text-2xl font-extrabold text-[#4A3E3D] flex items-center gap-2">
             ⚙️ Panel Kelola Foto Katalog
           </h1>
-          <p className="text-xs text-[#6E5B58]">Upload dan atur katalog foto per kategori</p>
+          <p className="text-xs text-[#6E5B58]">Upload sekaligus banyak foto per kategori & sub-folder</p>
         </div>
         
         <div className="flex gap-2">
@@ -291,10 +319,10 @@ export default function AdminPage() {
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* FORM UPLOAD */}
+        {/* FORM UPLOAD (SUPPORT MASSAL) */}
         <div className="bg-white p-6 rounded-2xl border border-[#EFE8DE] shadow-sm h-fit">
           <h2 className="text-lg font-bold text-[#4A3E3D] mb-4 flex items-center gap-2">
-            {editingId ? '✏️ Edit Foto Katalog' : '➕ Tambah Foto Katalog'}
+            {editingId ? '✏️ Edit Foto Katalog' : '⚡ Upload Massal Foto'}
           </h2>
 
           <form onSubmit={handleSubmitProduct} className="space-y-4 text-xs">
@@ -326,16 +354,27 @@ export default function AdminPage() {
             </div>
 
             <div>
-              <label className="block font-bold mb-1">URL Foto (Google Drive / Link)</label>
-              <input
-                type="text"
-                name="image"
-                value={formData.image}
+              <label className="block font-bold mb-1">
+                {editingId ? 'URL Foto' : 'URL Foto Massal (1 Link per Baris)'}
+              </label>
+              <textarea
+                name="imageLinks"
+                rows={editingId ? 3 : 6}
+                value={formData.imageLinks}
                 onChange={handleInputChange}
-                placeholder="Paste link gambar disini"
-                className="w-full px-3 py-2 border border-[#E8DDD1] rounded-xl focus:outline-none focus:border-[#E8A5C2]"
+                placeholder={
+                  editingId
+                    ? 'Paste link gambar baru'
+                    : 'Paste link gambar di sini.\nJika lebih dari 1, pisahkan dengan tekan Enter:\nhttps://drive.google.com/...\nhttps://drive.google.com/...'
+                }
+                className="w-full px-3 py-2 border border-[#E8DDD1] rounded-xl focus:outline-none focus:border-[#E8A5C2] font-mono text-[11px]"
                 required
               />
+              {!editingId && (
+                <p className="text-[10px] text-gray-400 mt-1">
+                  💡 Kamu bisa **paste banyak link** sekaligus. Tekan **Enter** untuk setiap link baru.
+                </p>
+              )}
             </div>
 
             <div className="flex gap-2 pt-2">
@@ -343,7 +382,7 @@ export default function AdminPage() {
                 type="submit"
                 className="flex-1 bg-[#E8A5C2] hover:bg-[#D893B0] text-white font-bold py-2.5 rounded-xl transition-all"
               >
-                {editingId ? 'Update Foto' : 'Simpan Foto'}
+                {editingId ? 'Update Foto' : '🚀 Simpan Semua Foto'}
               </button>
               {editingId && (
                 <button
