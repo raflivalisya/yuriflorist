@@ -14,6 +14,23 @@ const CATEGORIES = [
   'Wedding Bouquet',
 ];
 
+// Helper untuk mengambil Nama File atau ID dari URL
+function getFileNameFromUrl(url) {
+  if (!url) return '-';
+  try {
+    // Jika link Google Drive d/ID/view
+    if (url.includes('/d/')) {
+      const parts = url.split('/d/')[1]?.split('/');
+      return parts ? `Drive ID: ${parts[0].substring(0, 10)}...` : url;
+    }
+    // Jika link file biasa (misal: image.png)
+    const fileName = url.split('/').pop().split('?')[0];
+    return fileName.length > 20 ? fileName.substring(0, 20) + '...' : fileName;
+  } catch (e) {
+    return 'Link Foto';
+  }
+}
+
 export default function AdminPage() {
   // --- STATE AUTENTIKASI ---
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -37,7 +54,7 @@ export default function AdminPage() {
   const [selectedFilterCategory, setSelectedFilterCategory] = useState('ALL');
   const [selectedFilterSubcategory, setSelectedFilterSubcategory] = useState('ALL');
 
-  // Form disederhanakan: hanya Kategori, Sub-Folder, dan URL Foto
+  // Form
   const [formData, setFormData] = useState({
     category: CATEGORIES[0],
     subcategory: '',
@@ -189,7 +206,7 @@ export default function AdminPage() {
     });
   };
 
-  // 1. Dapatkan daftar opsi Sub-Folder unik berdasarkan Kategori Filter yang dipilih
+  // 1. Dapatkan daftar opsi Sub-Folder unik
   const availableSubcategoriesForFilter = Array.from(
     new Set(
       products
@@ -204,14 +221,13 @@ export default function AdminPage() {
     ? CATEGORIES
     : [selectedFilterCategory];
 
-  // 3. Filter akhir untuk mendapatkan daftar produk yang tampil
+  // 3. Filter akhir
   const filteredProducts = products.filter((p) => {
     const matchCategory = selectedFilterCategory === 'ALL' || p.category === selectedFilterCategory;
     const matchSubcategory = selectedFilterSubcategory === 'ALL' || p.subcategory === selectedFilterSubcategory;
     return matchCategory && matchSubcategory;
   });
 
-  // Reset filter subkategori jika kategori berubah
   const handleCategoryFilterChange = (cat) => {
     setSelectedFilterCategory(cat);
     setSelectedFilterSubcategory('ALL');
@@ -365,7 +381,7 @@ export default function AdminPage() {
           </form>
         </div>
 
-        {/* DAFTAR PRODUK DENGAN DUAL FILTER (KATEGORI & SUB-FOLDER) */}
+        {/* DAFTAR PRODUK DENGAN KOLOM NAMA FILE / LINK */}
         <div className="lg:col-span-2 space-y-4">
           
           {/* HEADER DAFTAR + DOUBLE DROPDOWN FILTER */}
@@ -379,9 +395,7 @@ export default function AdminPage() {
               </p>
             </div>
 
-            {/* BARIS DROPDOWN FILTER */}
             <div className="flex flex-wrap items-center gap-2">
-              {/* FILTER KATEGORI */}
               <select
                 value={selectedFilterCategory}
                 onChange={(e) => handleCategoryFilterChange(e.target.value)}
@@ -398,7 +412,6 @@ export default function AdminPage() {
                 })}
               </select>
 
-              {/* FILTER SUB-FOLDER / JENIS BUNGA */}
               <select
                 value={selectedFilterSubcategory}
                 onChange={(e) => setSelectedFilterSubcategory(e.target.value)}
@@ -432,13 +445,11 @@ export default function AdminPage() {
             </div>
           ) : (
             categoriesToDisplay.map((cat) => {
-              // Ambil foto dalam kategori ini yang lolos filter subkategori
               const catProducts = filteredProducts.filter((p) => p.category === cat);
               if (catProducts.length === 0) return null;
 
               return (
                 <div key={cat} className="bg-white rounded-2xl border border-[#EFE8DE] shadow-sm overflow-hidden mb-4">
-                  {/* HEADER KATEGORI */}
                   <div className="bg-[#FAF7F2] px-4 py-3 border-b border-[#EFE8DE] flex justify-between items-center">
                     <h3 className="font-extrabold text-xs sm:text-sm text-[#B85B84] flex items-center gap-2">
                       📁 {cat}
@@ -448,13 +459,13 @@ export default function AdminPage() {
                     </span>
                   </div>
 
-                  {/* TABEL PER KATEGORI */}
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
                       <thead>
                         <tr className="border-b border-[#EFE8DE] text-gray-400 text-[11px]">
                           <th className="p-3 w-16 text-center">Preview</th>
                           <th className="p-3">Jenis / Sub-Folder</th>
+                          <th className="p-3">Nama File / Link Foto</th>
                           <th className="p-3 text-center w-28">Aksi</th>
                         </tr>
                       </thead>
@@ -470,10 +481,25 @@ export default function AdminPage() {
                                 className="w-10 h-10 object-cover rounded-lg border border-[#EFE8DE] mx-auto bg-[#FAF7F2]"
                               />
                             </td>
+
                             {/* Nama Sub-Folder */}
                             <td className="p-3 font-bold text-[#4A3E3D]">
                               📄 {item.subcategory || '-'}
                             </td>
+
+                            {/* Nama File / Ringkasan Link */}
+                            <td className="p-3">
+                              <a 
+                                href={item.image} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-[11px] text-[#B85B84] hover:underline font-mono bg-[#FAF7F2] px-2 py-1 rounded-md border border-[#E8DDD1] inline-block max-w-[150px] truncate"
+                                title={item.image}
+                              >
+                                🔗 {getFileNameFromUrl(item.image)}
+                              </a>
+                            </td>
+
                             {/* Tombol Akses */}
                             <td className="p-3 text-center">
                               <div className="flex justify-center gap-1.5">
