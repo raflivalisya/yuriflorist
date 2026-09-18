@@ -14,39 +14,50 @@ const CATEGORIES = [
   'Wedding Bouquet',
 ];
 
-// FUNGSI UNTUK MENGAMBIL NAMA FILE ASLI DARI LINK/URL
-function extractFileNameFromUrl(url) {
+// FUNGSI PINTAR UNTUK MENGAMBIL NAMA FILE (MENGHINDARI TULISAN "VIEW")
+function extractFileNameFromUrl(url, fallbackName) {
   if (!url) return '-';
-  
+
   try {
     const decodedUrl = decodeURIComponent(url);
 
-    // 1. Jika link Google Drive memiliki parameter 'title' atau nama di URL
+    // 1. Ambil nama jika ada di parameter URL (misal: title=...)
     if (decodedUrl.includes('title=')) {
       const titleMatch = decodedUrl.match(/title=([^&]+)/);
       if (titleMatch && titleMatch[1]) return titleMatch[1];
     }
 
-    // 2. Jika link berupa URL file langsung (contoh: .../Rose%20Bb%20-%202.png)
+    // 2. Ambil dari nama file langsung di ujung URL
     const urlWithoutQuery = decodedUrl.split('?')[0];
     const fileName = urlWithoutQuery.split('/').pop();
 
-    // Pastikan hasil ekstraksi terlihat seperti nama file
-    if (fileName && fileName.length > 0 && !fileName.includes('http') && !fileName.includes('uc')) {
+    // Pastikan bukan kata 'view', 'uc', atau link kosong
+    if (
+      fileName &&
+      fileName.length > 0 &&
+      fileName.toLowerCase() !== 'view' &&
+      fileName.toLowerCase() !== 'uc' &&
+      !fileName.includes('http')
+    ) {
       return fileName;
     }
 
-    // 3. Jika link Google Drive berbentuk ID (/d/FILE_ID/view)
+    // 3. Jika pakai nama dari input/database
+    if (fallbackName && fallbackName !== 'Katalog' && fallbackName !== 'Foto Katalog') {
+      return fallbackName;
+    }
+
+    // 4. Jika link Google Drive (/d/FILE_ID/view), tampilkan ID singkatnya agar tidak kembar "view"
     if (url.includes('/d/')) {
       const idMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
       if (idMatch && idMatch[1]) {
-        return `Drive File (${idMatch[1].substring(0, 8)}...)`;
+        return `Drive ID: ${idMatch[1].substring(0, 8)}...`;
       }
     }
 
     return 'Foto Katalog';
   } catch (err) {
-    return 'Foto Katalog';
+    return fallbackName || 'Foto Katalog';
   }
 }
 
@@ -77,6 +88,7 @@ export default function AdminPage() {
   const [formData, setFormData] = useState({
     category: CATEGORIES[0],
     subcategory: '',
+    name: '', // Nama Opsional / Nama Foto
     image: '',
     price: '0',
     description: '',
@@ -161,7 +173,7 @@ export default function AdminPage() {
 
   // --- HANDLER PRODUK ---
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.value ? e.target.name : e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmitProduct = async (e) => {
@@ -170,7 +182,7 @@ export default function AdminPage() {
 
     const payload = {
       ...formData,
-      name: formData.subcategory || 'Katalog',
+      name: formData.name || formData.subcategory || 'Foto Katalog',
     };
 
     if (editingId) {
@@ -183,6 +195,7 @@ export default function AdminPage() {
     setFormData({
       category: CATEGORIES[0],
       subcategory: '',
+      name: '',
       image: '',
       price: '0',
       description: '',
@@ -196,6 +209,7 @@ export default function AdminPage() {
     setFormData({
       category: item.category || CATEGORIES[0],
       subcategory: item.subcategory || '',
+      name: item.name || '',
       image: item.image || '',
       price: item.price || '0',
       description: item.description || '',
@@ -215,6 +229,7 @@ export default function AdminPage() {
     setFormData({
       category: CATEGORIES[0],
       subcategory: '',
+      name: '',
       image: '',
       price: '0',
       description: '',
@@ -362,6 +377,18 @@ export default function AdminPage() {
             </div>
 
             <div>
+              <label className="block font-bold mb-1">Nama Foto / Keterangan (Opsional)</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                placeholder="Misal: Rose Bb - 2 (Boleh dikosongkan)"
+                className="w-full px-3 py-2 border border-[#E8DDD1] rounded-xl focus:outline-none focus:border-[#E8A5C2]"
+              />
+            </div>
+
+            <div>
               <label className="block font-bold mb-1">URL Foto (Google Drive / Link)</label>
               <input
                 type="text"
@@ -477,7 +504,7 @@ export default function AdminPage() {
                       <thead>
                         <tr className="border-b border-[#EFE8DE] text-gray-400 text-[11px]">
                           <th className="p-3 w-16 text-center">Preview</th>
-                          <th className="p-3">Nama File Foto</th>
+                          <th className="p-3">Nama File / Label</th>
                           <th className="p-3">Jenis / Sub-Folder</th>
                           <th className="p-3 text-center w-28">Aksi</th>
                         </tr>
@@ -495,9 +522,9 @@ export default function AdminPage() {
                               />
                             </td>
 
-                            {/* Nama File Foto Asli (Hasil Ekstraksi Link) */}
+                            {/* Nama File Foto / Ekstraksi Pintar */}
                             <td className="p-3 font-semibold text-[#4A3E3D]">
-                              🖼️ {extractFileNameFromUrl(item.image)}
+                              🖼️ {extractFileNameFromUrl(item.image, item.name)}
                             </td>
 
                             {/* Nama Sub-Folder */}
