@@ -24,6 +24,9 @@ export default function Home() {
   const [subcategories, setSubcategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // STATE UNTUK POP-UP PREVIEW GAMBAR
+  const [selectedImage, setSelectedImage] = useState(null);
+
   // Nomor WhatsApp Admin Yuri Florist
   const admin1Number = "6282183486092";
   const admin2Number = "6282178889350";
@@ -62,22 +65,11 @@ export default function Home() {
     (item) => item.category === activeCategory && item.subcategory === activeSubcategory
   );
 
-  const formatRupiah = (price) => {
-    if (!price) return 'Rp 0';
-    const numberOnly = price.toString().replace(/[^0-9]/g, '');
-    if (!numberOnly) return price;
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 0,
-    }).format(numberOnly);
-  };
-
   return (
     <div className="min-h-screen bg-[#FAF7F2] text-[#4A3E3D] font-sans selection:bg-[#F3C5D8] selection:text-[#4A3E3D]">
       
       {/* NAVBAR */}
-      <header className="sticky top-0 z-50 bg-[#FAF7F2]/90 backdrop-blur-md border-b border-[#EFE8DE] shadow-sm px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+      <header className="sticky top-0 z-40 bg-[#FAF7F2]/90 backdrop-blur-md border-b border-[#EFE8DE] shadow-sm px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
         <div className="flex items-center gap-1.5 sm:gap-2">
           <span className="text-xl sm:text-2xl">🌸</span>
           <h1 className="text-lg sm:text-2xl font-extrabold tracking-tight text-[#E8A5C2]">
@@ -96,7 +88,7 @@ export default function Home() {
         </nav>
       </header>
 
-      {/* HERO SECTION PERCANTIK */}
+      {/* HERO SECTION */}
       <section id="home" className="relative py-12 sm:py-20 px-4 text-center bg-gradient-to-b from-[#F7EBE8] via-[#FAF7F2]/60 to-[#FAF7F2] overflow-hidden">
         <div className="max-w-3xl mx-auto relative z-10">
           
@@ -169,7 +161,7 @@ export default function Home() {
           </h3>
           <div className="w-12 sm:w-16 h-1 bg-[#E8A5C2] mx-auto rounded-full mb-6"></div>
 
-          {/* LEVEL 1: FOLDER UTAMA DENGAN IKON SESUAI KATEGORI */}
+          {/* LEVEL 1: FOLDER UTAMA */}
           <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2.5 max-w-4xl mx-auto mb-6">
             {CATEGORIES.map((cat) => (
               <button
@@ -187,7 +179,7 @@ export default function Home() {
             ))}
           </div>
 
-          {/* LEVEL 2: SUB-FOLDER (FILE JENIS BUNGA) */}
+          {/* LEVEL 2: SUB-FOLDER */}
           {subcategories.length > 0 && (
             <div className="bg-white/80 backdrop-blur-md p-3 sm:p-4 rounded-2xl border border-[#EFE8DE] max-w-3xl mx-auto shadow-sm">
               <span className="block text-[10px] sm:text-xs font-bold text-[#B85B84] mb-2 uppercase tracking-wider">
@@ -212,7 +204,7 @@ export default function Home() {
           )}
         </div>
 
-{/* LEVEL 3: KATALOG FOTO */}
+        {/* LEVEL 3: KATALOG FOTO */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-[#E8A5C2]"></div>
@@ -228,16 +220,25 @@ export default function Home() {
             {displayedProducts.map((item) => (
               <div 
                 key={item.id} 
-                className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-[#EFE8DE] shadow-sm hover:shadow-lg hover:shadow-[#F8E3EC] transition-all duration-300 group"
+                onClick={() => setSelectedImage(formatDriveUrl(item.image))}
+                className="bg-[#FCE8E8] rounded-2xl sm:rounded-3xl overflow-hidden border border-[#F0D0E0] shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer group relative"
               >
-                {/* Frame Foto Produk Full Utuh */}
-                <div className="relative w-full aspect-square bg-[#FAF7F2] overflow-hidden">
+                {/* Frame Foto Produk */}
+                <div className="relative w-full aspect-square bg-[#FCE8E8] overflow-hidden flex items-center justify-center">
                   <img 
                     src={formatDriveUrl(item.image)} 
                     alt={item.name || 'Produk Yuri Florist'} 
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
+                  
+                  {/* Petunjuk Klik Untuk Memperbesar */}
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span className="bg-white/90 text-[#4A3E3D] text-[10px] font-bold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1">
+                      🔍 Perbesar
+                    </span>
+                  </div>
+
                   {item.subcategory && (
                     <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-md text-[#B85B84] text-[9px] font-bold px-2 py-0.5 rounded-full border border-[#F0D0E0] shadow-xs">
                       {item.subcategory}
@@ -250,7 +251,38 @@ export default function Home() {
         )}
       </main>
 
-      {/* FOOTER & INFORMASI LOKASI */}
+      {/* MODAL POP-UP GAMBAR BESAR */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative max-w-2xl w-full max-h-[90vh] flex flex-col items-center justify-center">
+            {/* Tombol Tutup */}
+            <button 
+              onClick={() => setSelectedImage(null)}
+              className="absolute -top-10 right-0 bg-white/20 hover:bg-white/40 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-sm transition-all"
+            >
+              ✕
+            </button>
+
+            {/* Gambar Pop-Up */}
+            <img 
+              src={selectedImage} 
+              alt="Preview Katalog" 
+              referrerPolicy="no-referrer"
+              className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl border-2 border-white/20"
+              onClick={(e) => e.stopPropagation()} // Supaya tidak tertutup saat gambar diklik
+            />
+
+            <p className="text-white/70 text-xs mt-3 text-center">
+              Klik di mana saja untuk menutup
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* FOOTER */}
       <footer id="kontak" className="bg-white border-t border-[#EFE8DE] text-center py-6 sm:py-10 px-4 text-xs sm:text-sm text-[#6E5B58]">
         <div className="max-w-md mx-auto mb-4">
           <p className="font-bold text-[#4A3E3D] text-sm sm:text-base">📍 Alamat Outlet / Store:</p>
