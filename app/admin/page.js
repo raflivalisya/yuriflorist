@@ -14,23 +14,6 @@ const CATEGORIES = [
   'Wedding Bouquet',
 ];
 
-// Helper untuk mengambil Nama File atau ID dari URL
-function getFileNameFromUrl(url) {
-  if (!url) return '-';
-  try {
-    // Jika link Google Drive d/ID/view
-    if (url.includes('/d/')) {
-      const parts = url.split('/d/')[1]?.split('/');
-      return parts ? `Drive ID: ${parts[0].substring(0, 10)}...` : url;
-    }
-    // Jika link file biasa (misal: image.png)
-    const fileName = url.split('/').pop().split('?')[0];
-    return fileName.length > 20 ? fileName.substring(0, 20) + '...' : fileName;
-  } catch (e) {
-    return 'Link Foto';
-  }
-}
-
 export default function AdminPage() {
   // --- STATE AUTENTIKASI ---
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -54,12 +37,12 @@ export default function AdminPage() {
   const [selectedFilterCategory, setSelectedFilterCategory] = useState('ALL');
   const [selectedFilterSubcategory, setSelectedFilterSubcategory] = useState('ALL');
 
-  // Form
+  // Form (kolom `name` dipakai untuk menyimpan Nama Foto/File)
   const [formData, setFormData] = useState({
     category: CATEGORIES[0],
     subcategory: '',
+    name: '', // Digunakan untuk Nama Foto (misal: Rose Bb - 2.png)
     image: '',
-    name: 'Katalog',
     price: '0',
     description: '',
   });
@@ -152,7 +135,7 @@ export default function AdminPage() {
 
     const payload = {
       ...formData,
-      name: formData.subcategory || 'Katalog',
+      name: formData.name || 'Foto Katalog', // Menyimpan Nama Foto yang diinput
     };
 
     if (editingId) {
@@ -165,8 +148,8 @@ export default function AdminPage() {
     setFormData({
       category: CATEGORIES[0],
       subcategory: '',
+      name: '',
       image: '',
-      name: 'Katalog',
       price: '0',
       description: '',
     });
@@ -179,8 +162,8 @@ export default function AdminPage() {
     setFormData({
       category: item.category || CATEGORIES[0],
       subcategory: item.subcategory || '',
+      name: item.name || '',
       image: item.image || '',
-      name: item.name || 'Katalog',
       price: item.price || '0',
       description: item.description || '',
     });
@@ -199,14 +182,14 @@ export default function AdminPage() {
     setFormData({
       category: CATEGORIES[0],
       subcategory: '',
+      name: '',
       image: '',
-      name: 'Katalog',
       price: '0',
       description: '',
     });
   };
 
-  // 1. Dapatkan daftar opsi Sub-Folder unik
+  // Filter & Sub-category
   const availableSubcategoriesForFilter = Array.from(
     new Set(
       products
@@ -216,12 +199,10 @@ export default function AdminPage() {
     )
   );
 
-  // 2. Kategori yang akan ditampilkan
   const categoriesToDisplay = selectedFilterCategory === 'ALL'
     ? CATEGORIES
     : [selectedFilterCategory];
 
-  // 3. Filter akhir
   const filteredProducts = products.filter((p) => {
     const matchCategory = selectedFilterCategory === 'ALL' || p.category === selectedFilterCategory;
     const matchSubcategory = selectedFilterSubcategory === 'ALL' || p.subcategory === selectedFilterSubcategory;
@@ -314,7 +295,7 @@ export default function AdminPage() {
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* FORM UPLOAD SIMPEL */}
+        {/* FORM UPLOAD */}
         <div className="bg-white p-6 rounded-2xl border border-[#EFE8DE] shadow-sm h-fit">
           <h2 className="text-lg font-bold text-[#4A3E3D] mb-4 flex items-center gap-2">
             {editingId ? '✏️ Edit Foto Katalog' : '➕ Tambah Foto Katalog'}
@@ -348,8 +329,22 @@ export default function AdminPage() {
               />
             </div>
 
+            {/* INPUT NAMA FOTO / FILE */}
             <div>
-              <label className="block font-bold mb-1">URL Foto Katalog (Google Drive / Link)</label>
+              <label className="block font-bold mb-1">Nama Foto / File</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                placeholder="Contoh: Rose Bb - 2.png"
+                className="w-full px-3 py-2 border border-[#E8DDD1] rounded-xl focus:outline-none focus:border-[#E8A5C2]"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold mb-1">URL Foto (Google Drive / Link)</label>
               <input
                 type="text"
                 name="image"
@@ -381,7 +376,7 @@ export default function AdminPage() {
           </form>
         </div>
 
-        {/* DAFTAR PRODUK DENGAN KOLOM NAMA FILE / LINK */}
+        {/* DAFTAR PRODUK */}
         <div className="lg:col-span-2 space-y-4">
           
           {/* HEADER DAFTAR + DOUBLE DROPDOWN FILTER */}
@@ -464,8 +459,8 @@ export default function AdminPage() {
                       <thead>
                         <tr className="border-b border-[#EFE8DE] text-gray-400 text-[11px]">
                           <th className="p-3 w-16 text-center">Preview</th>
-                          <th className="p-3">Jenis / Sub-Folder</th>
-                          <th className="p-3">Nama File / Link Foto</th>
+                          <th className="p-3">Nama Foto / File</th>
+                          <th className="p-3">Sub-Folder</th>
                           <th className="p-3 text-center w-28">Aksi</th>
                         </tr>
                       </thead>
@@ -476,28 +471,20 @@ export default function AdminPage() {
                             <td className="p-2 text-center">
                               <img
                                 src={formatDriveUrl(item.image)}
-                                alt={item.subcategory}
+                                alt={item.name}
                                 referrerPolicy="no-referrer"
                                 className="w-10 h-10 object-cover rounded-lg border border-[#EFE8DE] mx-auto bg-[#FAF7F2]"
                               />
                             </td>
 
-                            {/* Nama Sub-Folder */}
-                            <td className="p-3 font-bold text-[#4A3E3D]">
-                              📄 {item.subcategory || '-'}
+                            {/* Nama Foto / File */}
+                            <td className="p-3 font-semibold text-[#4A3E3D]">
+                              🖼️ {item.name || 'Tanpa Nama'}
                             </td>
 
-                            {/* Nama File / Ringkasan Link */}
-                            <td className="p-3">
-                              <a 
-                                href={item.image} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-[11px] text-[#B85B84] hover:underline font-mono bg-[#FAF7F2] px-2 py-1 rounded-md border border-[#E8DDD1] inline-block max-w-[150px] truncate"
-                                title={item.image}
-                              >
-                                🔗 {getFileNameFromUrl(item.image)}
-                              </a>
+                            {/* Nama Sub-Folder */}
+                            <td className="p-3 font-bold text-[#B85B84]">
+                              📄 {item.subcategory || '-'}
                             </td>
 
                             {/* Tombol Akses */}
