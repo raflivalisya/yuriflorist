@@ -212,7 +212,7 @@ export default function Home() {
           )}
         </div>
 
-        {/* LEVEL 3: KATALOG FOTO */}
+{/* LEVEL 3: KATALOG FOTO */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-[#E8A5C2]"></div>
@@ -224,40 +224,25 @@ export default function Home() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {displayedProducts.map((item) => (
               <div 
                 key={item.id} 
-                className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-[#EFE8DE] shadow-sm hover:shadow-lg hover:shadow-[#F8E3EC] transition-all duration-300 flex flex-col justify-between group"
+                className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-[#EFE8DE] shadow-sm hover:shadow-lg hover:shadow-[#F8E3EC] transition-all duration-300 group"
               >
-                {/* Foto Produk */}
-                <div className="relative w-full h-40 sm:h-64 bg-[#FAF7F2] overflow-hidden">
+                {/* Frame Foto Produk Full Utuh */}
+                <div className="relative w-full aspect-square bg-[#FAF7F2] overflow-hidden">
                   <img 
                     src={formatDriveUrl(item.image)} 
-                    alt={item.name} 
+                    alt={item.name || 'Produk Yuri Florist'} 
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                   />
-                  <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-md text-[#B85B84] text-[9px] font-bold px-2 py-0.5 rounded-full border border-[#F0D0E0]">
-                    {item.subcategory}
-                  </span>
-                </div>
-                
-                {/* Detail Produk */}
-                <div className="p-3 sm:p-6 flex flex-col flex-grow justify-between text-left">
-                  <div>
-                    <h4 className="font-bold text-[#4A3E3D] text-sm sm:text-lg mb-0.5 sm:mb-1 group-hover:text-[#E8A5C2] transition-colors line-clamp-1">
-                      {item.name}
-                    </h4>
-                    <p className="text-[10px] sm:text-xs text-[#6E5B58] line-clamp-2 leading-relaxed mb-2 sm:mb-4">
-                      {item.description}
-                    </p>
-                  </div>
-
-                  {/* Harga */}
-                  <div className="text-sm sm:text-xl font-black text-[#D878A0]">
-                    {formatRupiah(item.price)}
-                  </div>
+                  {item.subcategory && (
+                    <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-md text-[#B85B84] text-[9px] font-bold px-2 py-0.5 rounded-full border border-[#F0D0E0] shadow-xs">
+                      {item.subcategory}
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
